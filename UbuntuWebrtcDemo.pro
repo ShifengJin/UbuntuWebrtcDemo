@@ -1,33 +1,102 @@
-QT       += core gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2019-10-24T10:27:49
+#
+#-------------------------------------------------
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core gui network websockets widgets
+
+TARGET = WebRTCDemo_20191024
+TEMPLATE = app
+
+INCLUDEPATH += .
 
 CONFIG += c++11
 
-# The following define makes your compiler emit warnings if you use
-# any Qt feature that has been marked deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS QT_NO_KEYWORDS
+DEFINES += HAVE_WEBRTC_VOICE WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE WEBRTC_USE_H264 WEBRTC_INITIALIZE_FFMPEG FFMPEG_H264_DECODER WEBRTC_POSIX
 
-# You can also make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+unix: !mac{
+
+QMAKE_CFLAGS = -fno-rtti -pipe
+QMAKE_CXXFLAGS = -fno-rtti -pipe
+
+INCLUDEPATH+=$$PWD/webrtc/include
+INCLUDEPATH+=$$PWD/webrtc/include/webrtc
+
+INCLUDEPATH+=$$PWD/libyuv/include
+
+LIBS+=-L$$PWD/webrtc -lwebrtc -lpthread -ldl -lm -lX11
+LIBS+=-L$$PWD/libyuv -lyuv
+
+LIBS+=-L$$PWD/jsoncpp -ljsoncpp
+INCLUDEPATH+=$$PWD/jsoncpp/include
+
+# INCLUDEPATH += /usr/local/include/opencv
+# INCLUDEPATH += /usr/local/include/opencv2
+
+# LIBS += /usr/local/lib/libopencv_highgui.so \
+#         /usr/local/lib/libopencv_core.so \
+#         /usr/local/lib/libopencv_imgproc.so \
+#         /usr/local/lib/libopencv_imgcodecs.so \
+#         /usr/local/lib/libopencv_shape.so \
+#         /usr/local/lib/libopencv_videoio.so \
+#         /usr/local/lib/libopencv_calib3d.so \
+#         /usr/local/lib/libopencv_features2d.so \
+#         /usr/local/lib/libopencv_flann.so \
+#         /usr/local/lib/libopencv_ml.so \
+#         /usr/local/lib/libopencv_objdetect.so \
+#         /usr/local/lib/libopencv_photo.so \
+#         /usr/local/lib/libopencv_stitching.so \
+#         /usr/local/lib/libopencv_superres.so \
+#         /usr/local/lib/libopencv_video.so \
+#         /usr/local/lib/libopencv_videostab.so
+
+
+
+}
 
 SOURCES += \
-    VideoRender.cpp \
-    main.cpp \
-    mainwindow.cpp
+        main.cpp \
+        MainWindow.cpp \
+    QtWebrtcStream.cpp \
+    QtWebRTCVideoFrame.cpp \
+    QVideoRender.cpp \
+    WebRTCInterface.cpp \
+    CommonFunction.cpp \
+    ConnecttionFactory.cpp \
+    QtConferenceManager.cpp \
+    JanusWebSocket.cpp \
+    JanusVideoRoomManager.cpp \
+    JanusPeerConnection.cpp \
+    QtWebrtcRemoteStream.cpp \
+    CapturerTrackSource.cpp \
+    TestVideoCapture.cpp \
+    VcmCapture.cpp \
+    AlvaJsonTools.cpp \
+    AlvaThreadStateLists.cpp
 
 HEADERS += \
-    VideoRender.h \
-    mainwindow.h
+        MainWindow.h \
+    QtWebrtcStream.h \
+    QtWebRTCVideoFrame.h \
+    CommonDefine.h \
+    QVideoRender.h \
+    WebRTCInterface.h \
+    CommonFunction.h \
+    ConnecttionFactory.h \
+    QtConferenceManager.h \
+    JanusWebSocket.h \
+    JanusVideoRoomManager.h \
+    JanusPeerConnection.h \
+    QtWebrtcRemoteStream.h \
+    CapturerTrackSource.h \
+    TestVideoCapture.h \
+    VcmCapture.h \
+    AlvaJsonTools.h \
+    AlvaWebrtcCallBackDefine.h \
+    AlvaThreadStateLists.h
+
 
 FORMS += \
-    mainwindow.ui
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+        MainWindow.ui
