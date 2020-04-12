@@ -35,7 +35,7 @@ void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
        return;
     }
 
-
+#if 0
     int argbBufferSize = frame.height() * frame.width() * 4;
     unsigned char * argbBuffer = (unsigned char*)malloc(argbBufferSize);
 
@@ -56,6 +56,24 @@ void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
         free(argbBuffer);
         argbBuffer = nullptr;
     }
+#endif
+    int yuvBufferSize = buffer->width() * buffer->height() * 3 / 2;
+    unsigned char * yuvBuffer = (unsigned char*)malloc(yuvBufferSize);
+
+    RTC_CHECK(yuvBuffer!=nullptr);
+
+    memcpy(yuvBuffer, buffer->DataY(), buffer->width() * buffer->height());
+    memcpy(yuvBuffer + buffer->width() * buffer->height(), buffer->DataU(), buffer->width() * buffer->height() / 4);
+    memcpy(yuvBuffer + buffer->width() * buffer->height() + buffer->width() * buffer->height() / 4, buffer->DataV(), buffer->width() * buffer->height() / 4);
+    paintWidget->SetVideoSize(buffer->width(), buffer->height());
+    paintWidget->SetYUVData(yuvBuffer);
+
+    paintWidget->SetViewStated(true);
+    if(yuvBuffer != nullptr){
+        free(yuvBuffer);
+        yuvBuffer = nullptr;
+    }
+
     // ------------------------------------------------
     //RTC_LOG(INFO) << "============================> OnFrame";
     TestVideoCapture::OnFrame(frame);

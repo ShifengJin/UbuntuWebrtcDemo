@@ -32,23 +32,29 @@ void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
        return;
     }
 
-    int argbBufferSize = iFrame.height() * iFrame.width() * 4;
-    unsigned char * argbBuffer = (unsigned char*)malloc(argbBufferSize);
+    int yuvBufferSize = buffer->width() * buffer->height() * 3 / 2;
+    unsigned char * yuvBuffer = (unsigned char*)malloc(yuvBufferSize);
 
-    RTC_CHECK(argbBuffer!=nullptr);
-
+    RTC_CHECK(yuvBuffer!=nullptr);
+#if 0
     int ret =  libyuv::I420ToARGB(
                 buffer->DataY(), buffer->StrideY(),
                 buffer->DataU(), buffer->StrideU(),
                 buffer->DataV(), buffer->StrideV(),
                 argbBuffer, buffer->width() * 4,
                 buffer->width(), buffer->height());
+#endif
+    memcpy(yuvBuffer, buffer->DataY(), buffer->width() * buffer->height());
+    memcpy(yuvBuffer + buffer->width() * buffer->height(), buffer->DataU(), buffer->width() * buffer->height() / 4);
+    memcpy(yuvBuffer + buffer->width() * buffer->height() + buffer->width() * buffer->height() / 4, buffer->DataV(), buffer->width() * buffer->height() / 4);
+    paintWidget->SetVideoSize(buffer->width(), buffer->height());
+    paintWidget->SetYUVData(yuvBuffer);
 
-    paintWidget->RenderARGBVideo(argbBuffer, buffer->width(), buffer->height());
+    paintWidget->SetViewStated(true);
 
-    if(argbBuffer != nullptr){
-        free(argbBuffer);
-        argbBuffer = nullptr;
+    if(yuvBuffer != nullptr){
+        free(yuvBuffer);
+        yuvBuffer = nullptr;
     }
 }
 

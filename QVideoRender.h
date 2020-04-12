@@ -1,36 +1,54 @@
 #ifndef QVIDEORENDER_H
 #define QVIDEORENDER_H
 
+#include <QObject>
 #include <QWidget>
 #include <QMutex>
-#include <QImage>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
 
-/*
- * author      : ShifengJin
- * time        : 20191024
- * create time : 20191024
- * change time : 20191024
- * change list :
- *               @20191024: base
- * note : used to draw video frame
- */
 
-class QVideoRender : public QWidget
+class QVideoRender : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
     explicit QVideoRender(QWidget *parent = nullptr);
-    ~QVideoRender();
+    virtual ~QVideoRender();
 
-    void RenderARGBVideo(unsigned char * iData, int iWidth, int iHeight);
+    void SetVideoSize(int width, int height);
+    void SetYUVData(unsigned char* yuvData);
+
+    void SetViewStated(bool flag);
+
+protected:
+    void initializeGL() override;
+
+    void resizeGL(int w, int h) override;
+
+    void paintGL() override;
 
 private:
+    QOpenGLShaderProgram *program;
+
+    GLuint textureUniformY, textureUniformU, textureUniformV;
+    GLuint idY, idU, idV;
+
+    QOpenGLTexture *pTextureY;
+    QOpenGLTexture *pTextureU;
+    QOpenGLTexture *pTextureV;
+
+    QOpenGLShader *pVShader;
+    QOpenGLShader *pFShader;
+
+    int mVideoW, mVideoH;
+
+    unsigned char* pBufYuv420p;
+
+    bool viewFlag;
+
     QMutex mMutex;
-    QImage mImage;
-
-private:
-    void paintEvent(QPaintEvent *paintEvent);
-    void paintImage(QPainter &painter);
 };
 
 #endif // QVIDEORENDER_H
