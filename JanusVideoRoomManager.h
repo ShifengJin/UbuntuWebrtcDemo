@@ -1,71 +1,94 @@
 #ifndef JANUSVIDEOROOMMANAGER_H
 #define JANUSVIDEOROOMMANAGER_H
 
-#include <QObject>
 #include "JanusWebSocket.h"
 #include "JanusPeerConnection.h"
-#include "AlvaWebrtcCallBackDefine.h"
 
-class JanusVideoRoomManager : public QObject
+typedef std::function<void(const Json::Value &recvData)> janus_event_listener;
+typedef std::function<void(long long, bool, bool, bool)> CONNECTTOPEER_CALLBACK;
+typedef std::function<void(long long, std::string, std::string, bool isTextRoom)> REMOTESDP_CALLBACK;
+typedef std::function<void(long long)> REMOTESTREAMREMOVE_CALLBACK;
+
+class JanusVideoRoomManager
 {
-    Q_OBJECT
 public:
     JanusVideoRoomManager();
     ~JanusVideoRoomManager();
 
-    void ConnectServer(const std::string & server);
+    void ConnectServer(const std::string &server);
+
+    void AddMessageSuccessCallback(QString tran, const janus_event_listener &func);
+    void AddMessageAckCallback(QString tran, const janus_event_listener &func);
+
+
+    void CreateVideoRoom(int roomId);
+    void CreateTextRoom(int roomId);
+
+    void JoinVideoRoom(int roomId);
+    void JoinTextRoom(int roomId);
+
+    void RegisterConnectToPeerCallBack(CONNECTTOPEER_CALLBACK callback);
+    void RegisterRemoteSdpCallBack(REMOTESDP_CALLBACK callback);
+    void RegisterRemoteStreamRemoveCallBack(REMOTESTREAMREMOVE_CALLBACK callback);
+
     void DisConnectServer();
     bool DisconnectPeer(long long peer_id);
     void SendSDP(long long &id, std::string sdp, std::string type);
     void SendCandidate(long long &id, QString &sdpMid, int &sdpMLineIndex, QString &candidate);
 
-    void RegisterConnectToPeer_CallBack(CONNECTTOPEER_CALLBACK callback);
-    void RegisterRemoteSdp_CallBack(REMOTESDP_CALLBACK callback);
-    void RegisterRemoteStreamRemove_callBack(REMOTESTREAMREMOVE_CALLBACK callback);
-
-private Q_SLOTS:
-    // 當 mSocket 鏈接成功後觸發該函數
-    void onSocketConnected();
-    // 當 mSocket 斷開鏈接後觸發該函數
-    void onSocketDisconnected();
-
 private:
-    // webSocket 鏈接成功後需要調用該函數來創建 sessionId
-    // 第二步  第三部
-    void createSessionId();
+    void onSocketConnected();
+    void onSocketDisConnected();
 
+    void onWebSocketReceivedMessage(QString message);
+
+    void onWebSocketHeartBeatMessage();
+
+    void createSessionId();
     void onCreateSessionId(const Json::Value &recvmsg);
 
-    void join();
-    void joinText();
 
 
+    void onHeartBeat(const Json::Value &recvmsg);
 
-    //第三步  第五步  第六步
-    void onEventJoin(const Json::Value &recvData);
 
-    void onEventAttached(const Json::Value &recvData);
+    void onMessageSuccess(const std::string &transaction, const Json::Value &object);
 
-    void onEventEvent(const Json::Value &recvData);
-    void onEventEvent_TextRoom(const Json::Value &recvData);
+    void onMessageAck(const std::string &transaction, const Json::Value &object);
 
-    void onEventPublishers(const Json::Value &recvData);
+    void onVideoRoomEvent(const std::string &event_std, const Json::Value &object);
+    void onTextRoomEvent(const std::string &event_std, const Json::Value &object);
 
-    void onEventSdp(const Json::Value &recvdata, bool isTextRoom);
 
-    void onEventUnpublish(const Json::Value &recvdata);
+    void onVideoRoomEventPublisher(const Json::Value &recvData);
+    void onVideoRoomEventJoin(const Json::Value &recvData);
+
+    void onVideoRoomEventSdp(const Json::Value &recvData, bool isTextRoom);
+    void onVideoRoomEventAttached(const Json::Value &recvData);
+
+    void onVideoRoomEventUnpublish(const Json::Value &recvData);
+    void onVideoRoomEventEvent(const Json::Value &recvData);
 private:
-    JanusWebSocket             mSocket;
+    JanusWebSocket          *pWebSocket;
 
-    long long int              mSessionId = 0;
-    QString                    mOpaqueId;
-    long long int              mPrivateId = 0;
-    std::list<JanusPeerConnection*> mPeersList;
+    int                 mVideoRoomID = 1234;
+    int                 mTextRoomID = 1234;
 
-private:
-    CONNECTTOPEER_CALLBACK       OnConnectToPeer;
-    REMOTESDP_CALLBACK           OnRemoteSdp;
-    REMOTESTREAMREMOVE_CALLBACK  OnRemoteStreamRemove;
+    long long int       mSessionId = 0;
+    long long int       mPrivatedId = 0;
+
+    QMap<QString, janus_event_listener> mMessage_success_callback;
+    QMap<QString, janus_event_listener> mMessage_ack_callback;
+
+    QMap<QString, janus_event_listener> mMessage_event_videoRoom;
+    QMap<QString, janus_event_listener> mMessage_event_textRoom;
+
+    std::list<JanusPeerConnection*>      mVideoRoomPeerList;
+    std::list<JanusPeerConnection*>      mTextRoomPeerList;
+
+    CONNECTTOPEER_CALLBACK               OnConnectToPeer;
+    REMOTESDP_CALLBACK                   OnRemoteSdp;
+    REMOTESTREAMREMOVE_CALLBACK          OnRemoteStreamRemove;
 
 };
 

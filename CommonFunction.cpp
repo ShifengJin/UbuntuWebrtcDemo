@@ -9,26 +9,8 @@
 
 #include <unistd.h>
 #include "CommonFunction.h"
-#include "AlvaJsonTools.h"
+#include "JsonTools.h"
 #include "json/json.h"
-
-bool ConvertToJson(const QString &msg, QJsonObject &ret)
-{
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(msg.toLatin1(), &parseError);
-    if (parseError.error != QJsonParseError::NoError)
-    {
-        return false;
-    }
-
-    if (!document.isObject())
-    {
-        return false;
-    }
-
-    ret = document.object();
-    return true;
-}
 
 QString GetRandomString(int len)
 {
@@ -83,11 +65,4 @@ std::string GetPeerName()
 }
 
 
-long long JsonValueToLongLong(const Json::Value &jsonData, std::string k)
-{
-    Json::Value idStr;
-    GetValueFromJsonObject(jsonData, k, &idStr);
-    std::string id_stdStr = JsonValueToString(idStr);
-    long long returnValue = atoll(id_stdStr.c_str());
-    return returnValue;
-}
+

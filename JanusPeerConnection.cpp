@@ -1,10 +1,16 @@
 #include "JanusPeerConnection.h"
 #include "CommonDefine.h"
 #include "CommonFunction.h"
+#include "JsonTools.h"
+#include "JanusVideoRoomManager.h"
 
-JanusPeerConnection::JanusPeerConnection(JanusWebSocket &socket, QString opaqueId, QObject *parent) : mSocket(socket)
+JanusPeerConnection::JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId, bool tIsVideoRoomCreate, bool tIsTextRoomCreate)
 {
-    mOpaqueId = opaqueId;
+    pVideoRoomManager = tpVideoRoomManager;
+    pWebSocket = tpWebSocket;
+    mSessionID = tSessionId;
+    isVideoRoomCreate = tIsVideoRoomCreate;
+    isTextRoomCreate = tIsTextRoomCreate;
 
 }
 
@@ -13,26 +19,203 @@ JanusPeerConnection::~JanusPeerConnection()
 
 }
 
-void JanusPeerConnection::AttachVideoRoom()
+void JanusPeerConnection::SetVideoRoomDisplayName(std::string name)
+{
+    mVideoRoomDisplayName = name;
+}
+
+void JanusPeerConnection::SetTextRoomDisplayName(std::string name)
+{
+    mTextRoomDisplayName = name;
+}
+void JanusPeerConnection::AttachVideoRoom(int roomId)
 {
     Json::Value msg;
     msg["janus"] = "attach";
 
     msg["plugin"] = "janus.plugin.videoroom";
 
-    msg["opaque_id"] = mOpaqueId.toStdString();
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onAttachVideoRoom, this, std::placeholders::_1));
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+
+    mVideoRoomId = roomId;
+
+    if(isVideoRoomCreate){
+        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomCreate, this, std::placeholders::_1));
+    }else{
+        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomJoin, this, std::placeholders::_1));
+    }
 }
 
-void JanusPeerConnection::AttachTextRoom()
+void JanusPeerConnection::AttachTextRoom(int roomId)
 {
     Json::Value msg;
     msg["janus"] = "attach";
 
     msg["plugin"] = "janus.plugin.textroom";
 
-    msg["opaque_id"] = mOpaqueId.toStdString();
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onAttachTextRoom, this, std::placeholders::_1));
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+
+    mTextRoomId = roomId;
+    if(isTextRoomCreate){
+        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomCreate, this, std::placeholders::_1));
+    }else{
+        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomJoin, this, std::placeholders::_1));
+    }
+}
+
+void JanusPeerConnection::SetSubscribe(long long id)
+{
+    mSubscribeId = id;
+}
+
+void JanusPeerConnection::SetPrivateId(long long id)
+{
+    mPrivateId = id;
+}
+
+long long JanusPeerConnection::GetVideoRoomHandleID()
+{
+    return mVideoRoomHandleID;
+}
+
+long long JanusPeerConnection::GetTextRoomHandleID()
+{
+    return mTextRoomHandleID;
+}
+
+long long JanusPeerConnection::GetSubscribeID()
+{
+    return mSubscribeId;
+}
+
+void JanusPeerConnection::onAttachVideoRoomJoin(const Json::Value &recvMsg)
+{
+    mVideoRoomHandleID = JsonValueToLongLong(recvMsg, "id");
+    joinVideoRoom();
+}
+
+void JanusPeerConnection::onAttachVideoRoomCreate(const Json::Value &recvMsg)
+{
+    mVideoRoomHandleID = JsonValueToLongLong(recvMsg, "id");
+    createVideoRoom();
+}
+
+void JanusPeerConnection::onAttachTextRoomJoin(const Json::Value &recvMsg)
+{
+    mTextRoomHandleID = JsonValueToLongLong(recvMsg, "id");
+    joinTextRoom();
+}
+
+void JanusPeerConnection::onAttachTextRoomCreate(const Json::Value &recvMsg)
+{
+    mTextRoomHandleID = JsonValueToLongLong(recvMsg, "id");
+    createTextRoom();
+}
+
+void JanusPeerConnection::joinVideoRoom()
+{
+    Json::Value msg;
+
+    msg["janus"] = "message";
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    Json::Value body;
+    body["request"] = "join";
+    body["room"] = mVideoRoomId;
+
+    if(mSubscribeId == 0){
+        body["ptype"] = "publisher";
+        body["display"] = mVideoRoomDisplayName;
+    }else{
+        body["ptype"] = "subscriber";
+        body["feed"] = (double)mSubscribeId;
+        body["private_id"] = (double)mPrivateId;
+    }
+    msg["body"] = body;
+
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+}
+
+void JanusPeerConnection::joinTextRoom()
+{
+    Json::Value msg;
+    msg["janus"] = "message";
+    msg["handle_id"] = (double)mTextRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    Json::Value body;
+    body["request"] = "setup";
+    msg["body"] = body;
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+}
+
+void JanusPeerConnection::createVideoRoom()
+{
+    Json::Value msg;
+
+    msg["janus"] = "message";
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    Json::Value body;
+    body["request"] = "create";
+    body["room"] = mVideoRoomId;
+
+    if(mSubscribeId == 0){
+        body["ptype"] = "publisher";
+        body["display"] = mVideoRoomDisplayName;
+    }else{
+        body["ptype"] = "subscriber";
+        body["feed"] = (double)mSubscribeId;
+        body["private_id"] = (double)mPrivateId;
+    }
+    msg["body"] = body;
+
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+}
+
+void JanusPeerConnection::createTextRoom()
+{
+    Json::Value msg;
+    msg["janus"] = "message";
+    msg["handle_id"] = (double)mTextRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    Json::Value body;
+    body["request"] = "create";
+    msg["body"] = body;
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
 }
 
 void JanusPeerConnection::SendSDP(std::string sdp, std::string type)
@@ -56,8 +239,14 @@ void JanusPeerConnection::SendSDP(std::string sdp, std::string type)
     msg["body"] = body;
     msg["jsep"] = jsep;
 
-    msg["handle_id"] = (double)mHandleId;
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onSendSDP, this, std::placeholders::_1));
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
 
 }
 
@@ -76,75 +265,36 @@ void JanusPeerConnection::SendSDPText(std::string sdp, std::string type)
     msg["body"] = body;
     msg["jsep"] = jsep;
 
-    msg["handle_id"] = (double)mHandleId;
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onSendSDP, this, std::placeholders::_1));
-}
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
 
-void JanusPeerConnection::onAttachVideoRoom(const Json::Value &recvmsg)
-{
-    mHandleId = JsonValueToLongLong(recvmsg, "id");
+    msg["session_id"] = (double)mSessionID;
 
-    join();
-
-}
-
-void JanusPeerConnection::onAttachTextRoom(const Json::Value &recvmsg)
-{
-    mHandleId = JsonValueToLongLong(recvmsg, "id");
-    requestSetup();
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
 }
 
 
 
-void JanusPeerConnection::join()
-{
-    Json::Value msg;
-    msg["janus"] = "message";
-    msg["handle_id"] = (double)mHandleId;
-
-    Json::Value body;
-    body["request"] = "join";
-    body["room"] = 1234;
-
-    if(mSubscribeId == 0){
-        body["ptype"] = "publisher";
-        body["display"] = "cc"; // "cc"
-    }else{
-        body["ptype"] = "subscriber";
-        body["feed"] = (double)mSubscribeId;
-        body["private_id"] = (double)mPrivateId;
-    }
-    msg["body"] = body;
-
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onJoin, this, std::placeholders::_1));
-}
 
 void JanusPeerConnection::requestSetup()
 {
     Json::Value msg;
     msg["janus"] = "message";
-    msg["handle_id"] = (double)mHandleId;
+    msg["handle_id"] = (double)mVideoRoomHandleID;
 
     Json::Value body;
     body["request"] = "setup";
     msg["body"] = body;
 
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onRequestSetup, this, std::placeholders::_1));
-}
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
 
-void JanusPeerConnection::onRequestSetup(const Json::Value &recvmsg)
-{
+    msg["session_id"] = (double)mSessionID;
 
-}
-
-void JanusPeerConnection::onJoin(const Json::Value &recvmsg)
-{
-
-}
-
-void JanusPeerConnection::onSendSDP(const Json::Value &recvData)
-{
-
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
 }
 
 void JanusPeerConnection::SendCandidate(QString sdpMid, int sdpMLineIndex, QString candidate)
@@ -165,11 +315,13 @@ void JanusPeerConnection::SendCandidate(QString sdpMid, int sdpMLineIndex, QStri
     }
     msg["candidate"] = candidateObj;
 
-    msg["handle_id"] = (double)mHandleId;
-    mSocket.EmitMessage(msg, std::bind(&JanusPeerConnection::onSendCandidate,this,std::placeholders::_1));
-}
+    msg["handle_id"] = (double)mVideoRoomHandleID;
 
-void JanusPeerConnection::onSendCandidate(const Json::Value &recvmsg)
-{
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
 
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
 }

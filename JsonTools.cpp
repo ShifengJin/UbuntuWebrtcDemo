@@ -1,17 +1,50 @@
-#include "AlvaJsonTools.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "JsonTools.h"
 #include "json/json.h"
-#include <webrtc/rtc_base/string_encode.h>
+
+std::string ToString(bool v){
+    std::stringstream os;
+    os << v;
+    std::string out;
+    os >> out;
+    return out;
+}
+
+std::string ToString(int v){
+    std::stringstream ss;
+    ss << v;
+    std::string out;
+    ss >> out;
+    return out;
+}
+
+std::string ToString(unsigned int v){
+    std::stringstream ss;
+    ss << v;
+    std::string out;
+    ss >> out;
+    return out;
+}
+
+std::string ToString(double v){
+    std::stringstream ss;
+    ss << v;
+    std::string out;
+    ss >> out;
+    return out;
+}
 
 bool GetStringFromJson(const Json::Value& in, std::string* out) {
   if (!in.isString()) {
     if (in.isBool()) {
-      *out = rtc::ToString(in.asBool());
+      *out = ToString(in.asBool());
     } else if (in.isInt()) {
-      *out = rtc::ToString(in.asInt());
+      *out = ToString(in.asInt());
     } else if (in.isUInt()) {
-      *out = rtc::ToString(in.asUInt());
+      *out = ToString(in.asUInt());
     } else if (in.isDouble()) {
-      *out = rtc::ToString(in.asDouble());
+      *out = ToString(in.asDouble());
     } else {
       return false;
     }
@@ -275,4 +308,39 @@ std::string JsonValueToString(const Json::Value& json) {
   return value.substr(0, value.size() - 1);  // trim trailing newline
 }
 
+long long JsonValueToLongLong(const Json::Value &jsonData, std::string k)
+{
+    Json::Value idStr;
+    GetValueFromJsonObject(jsonData, k, &idStr);
+    std::string id_stdStr = JsonValueToString(idStr);
+    long long returnValue = atoll(id_stdStr.c_str());
+    return returnValue;
+}
 
+QString JsonValueToQString(Json::Value &message)
+{
+    std::string json_std_str = JsonValueToString(message);
+    QString json_qt_str = QString::fromStdString(json_std_str);
+    QJsonObject jsonObject;
+    ConvertToJson(json_qt_str, jsonObject);
+    QString out = QString(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact));
+    return out;
+}
+
+bool ConvertToJson(const QString &msg, QJsonObject &ret)
+{
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(msg.toLatin1(), &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        return false;
+    }
+
+    if (!document.isObject())
+    {
+        return false;
+    }
+
+    ret = document.object();
+    return true;
+}

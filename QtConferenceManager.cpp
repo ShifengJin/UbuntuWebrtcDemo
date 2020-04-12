@@ -1,20 +1,22 @@
 #include "QtConferenceManager.h"
-#include "AlvaJsonTools.h"
+#include "JsonTools.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <thread>
+
+#include "CommonFunction.h"
 
 QtConferenceManager* QtConferenceManager::instance = NULL;
 
 QtConferenceManager::QtConferenceManager(QObject *parent) : QObject(parent)
 {
-    mJanusVideoRoomManager.RegisterConnectToPeer_CallBack(std::bind(&QtConferenceManager::ConnectToPeer, this,
+    mJanusVideoRoomManager.RegisterConnectToPeerCallBack(std::bind(&QtConferenceManager::ConnectToPeer, this,
                                                                     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteSdp_CallBack(std::bind(&QtConferenceManager::onRetmoeSDP, this,
+    mJanusVideoRoomManager.RegisterRemoteSdpCallBack(std::bind(&QtConferenceManager::onRetmoeSDP, this,
                                                                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteStreamRemove_callBack(std::bind(&QtConferenceManager::onRemoteStreamRemove, this,
+    mJanusVideoRoomManager.RegisterRemoteStreamRemoveCallBack(std::bind(&QtConferenceManager::onRemoteStreamRemove, this,
                                                                          std::placeholders::_1));
 }
 

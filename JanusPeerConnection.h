@@ -3,51 +3,62 @@
 
 #include <QObject>
 #include <QString>
+#include "JsonTools.h"
 #include "JanusWebSocket.h"
 
-class JanusPeerConnection : public QObject
+class JanusPeerConnection
 {
-    Q_OBJECT
 public:
-    JanusPeerConnection(JanusWebSocket &socket, QString opaqueId, QObject *parent = nullptr);
+    JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId, bool tIsVideoRoomCreate, bool tIsTextRoomCreate);
     ~JanusPeerConnection();
 
-    void AttachVideoRoom();
-    void AttachTextRoom();
+    void SetVideoRoomDisplayName(std::string name);
+    void SetTextRoomDisplayName(std::string name);
 
-    inline long long int GetHandleId(){return mHandleId;}
+    void AttachVideoRoom(int roomId);
+    void AttachTextRoom(int roomId);
 
-    inline void SetSubscribe(long long int id){mSubscribeId = id;}
-    inline void SetPrivateId(long long int id){mPrivateId = id;}
-    inline long long int GetSubscribe(){return mSubscribeId;}
+    void SetSubscribe(long long id);
+    void SetPrivateId(long long id);
+    long long GetVideoRoomHandleID();
+    long long GetTextRoomHandleID();
+    long long GetSubscribeID();
 
     void SendSDP(std::string sdp, std::string type);
     void SendSDPText(std::string sdp, std::string type);
     void SendCandidate(QString sdpMid, int sdpMLineIndex, QString candidate);
 
 private:
-    void onAttachVideoRoom(const Json::Value &recvmsg);
-    void onAttachTextRoom(const Json::Value &recvmsg);
+    void onAttachVideoRoomJoin(const Json::Value &recvMsg);
+    void onAttachVideoRoomCreate(const Json::Value &recvMsg);
 
-    void join();    
-    void onJoin(const Json::Value &recvmsg);
+    void onAttachTextRoomJoin(const Json::Value &recvMsg);
+    void onAttachTextRoomCreate(const Json::Value &recvMsg);
+
+    void joinVideoRoom();
+    void joinTextRoom();
+
+    void createVideoRoom();
+    void createTextRoom();
+
 
     void requestSetup();
-    void onRequestSetup(const Json::Value &recvmsg);
-
-
-    void onSendSDP(const Json::Value &recvData);
-    void onSendCandidate(const Json::Value &recvmsg);
-
 private:
-    JanusWebSocket          &mSocket;        // 公用webSocket的引用
-    //long long                   mHandleId = 0;
-    long long int                   mHandleId = 0;
-    QString                  mOpaqueId;
-    //long long                   mPrivateId = 0;
-    long long int                   mPrivateId = 0;
-    //long long                   mSubscribeId = 0;
-    long long int                   mSubscribeId = 0;
+    void               *pVideoRoomManager;
+    JanusWebSocket     *pWebSocket;
+    long long int       mSessionID;
+    long long int       mVideoRoomHandleID;
+    long long int       mTextRoomHandleID;
+    long long int       mPrivateId = 0;
+    long long int       mSubscribeId = 0;
+
+    int mVideoRoomId;
+    int mTextRoomId;
+    std::string mVideoRoomDisplayName;
+    std::string mTextRoomDisplayName;
+
+    bool isVideoRoomCreate = false;
+    bool isTextRoomCreate = false;
 };
 
 #endif // JANUSPEERCONNECTION_H

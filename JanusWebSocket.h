@@ -3,14 +3,13 @@
 
 #include <QObject>
 #include <QtWebSockets>
-#include "CommonFunction.h"
 
-#include <QObject>
-#include <QtWebSockets>
-
-typedef std::function<void(const Json::Value &recvData)> janus_event_listener;
-typedef std::function<void(void)> WEBSOCKETCONNECTED_CALLBACK;
-typedef std::function<void(void)> WEBSOCKETDISCONNECTED_CALLBACK;
+typedef std::function<void(QString)> WEBSOCKET_RECEIVEMESSAGE_CALLBACK;
+typedef std::function<void(void)>    WEBSOCKET_ERROR_CALLBACK;
+typedef std::function<void(void)>    WEBSOCKET_CONNECTED_CALLBACK;
+typedef std::function<void(void)>    WEBSOCKET_DISCONNECTED_CALLBACK;
+typedef std::function<void(void)>    WEBSOCKET_HEARTBEATINFO_CALLBACK;
+typedef std::function<void(void)>    WEBSOCKET_TIMEOUT_CALLBACK;
 
 
 class JanusWebSocket : public QObject
@@ -20,80 +19,71 @@ public:
     explicit JanusWebSocket(QObject * parent = Q_NULLPTR);
     ~JanusWebSocket();
 
-    bool Open(const QString &url);
+    void Open(const QString &url);
     void Close();
+    void SendMessage(QString message);
+    void ResetTimer();
 
-    void EmitMessage(Json::Value &message, const janus_event_listener &func);
+    void RegisterReceiveMessageCallback(WEBSOCKET_RECEIVEMESSAGE_CALLBACK callback);
 
-    void SetEventCallBack(const QString &event_name, const janus_event_listener &func);
+    void RegisterErrorCallback(WEBSOCKET_ERROR_CALLBACK callback);
 
-    void SetSessionID(const long long &id);
+    void RegisterConnectedCallback(WEBSOCKET_CONNECTED_CALLBACK callback);
 
-    void RegisterWebSocketConnected_CallBack(WEBSOCKETCONNECTED_CALLBACK callback);
-    void RegisterWebSocketDisConnected_CallBack(WEBSOCKETDISCONNECTED_CALLBACK callback);
+    void RegisterDisConnectedCallback(WEBSOCKET_DISCONNECTED_CALLBACK callback);
+
+    void RegisterHeartBeatCallback(WEBSOCKET_HEARTBEATINFO_CALLBACK callback);
+
+    void RegisterTimeOutCallback(WEBSOCKET_TIMEOUT_CALLBACK callback);
 
 private Q_SLOTS:
 
-    /*
-     * websocket 收到信息後，此函數會觸發
-    */
+    /**
+     * @brief websocket 收到信息后调用该函数
+     * @param textMessage : 收到的信息
+     */
     void onWsMessage(QString textMessage);
 
-    /*
-     * websocket 發生錯誤會觸發此函數
-    */
+    /**
+     * @brief websocket 发生错误后调用该函数
+     * @param error 错误信息
+     */
     void onWsError(QAbstractSocket::SocketError error);
 
-    /*
-     * 設定時間,保證websocket 一直處於鏈接狀態，同時對onPingTimeout狀態清除
-    */
+    /**
+     * @brief 心跳检测函数
+     */
     void onPingTimer();
 
-    /*
-     * 設定時間,如果websocket 在該時間內沒有連同,則會觸發該函數
-    */
+    /**
+     * @brief 连接超时调用该函数
+     */
     void onPingTimeout();
 
+    /**
+     * @brief websocket 连接成功后调用该函数
+     */
     void onWebSocketConnected();
 
+    /**
+     * @brief websocket 断开连接后调用该函数
+    */
     void onWebSocketDisConnected();
 
 private:
-    /*
-     * 通過websocket 發送數據
-    */
-    QString doEmitMessage(Json::Value &message);
+    QWebSocket               *pWebSocket;
 
-    /*
-     *
-    */
-    void onPingAck();
-    /*
-     * onEvent  onNotify  onMsgAck 三個函數在onWsMessage 函數中調用,
-     * 即，對於收到的不同信息進行不同的處理
-     */
-    void onEvent(const std::string &event, const Json::Value &object);
+    uint                      pingInterval = 25000;
+    uint                      pingTimeout = 60000;
+    QTimer                   *pPingTimer;
+    QTimer                   *pPingTimeOutTimer;
 
-    void onNotify(const std::string &notify_std, const Json::Value &object);
-
-    void onMsgAck(const std::string &transaction, const Json::Value &object);
-
-private:
-    QWebSocket       *pWebSocket;
-
-    QMap<QString, janus_event_listener> mMessageCallbacks;
-    QMap<QString, janus_event_listener> mEventCallbacks;
-    QMap<QString, janus_event_listener> mNotifyCallbacks;
-
-    uint              pingInterval = 25000;
-    uint              pingTimeout  = 60000;
-    QTimer           *pPingTimer;
-    QTimer           *pPingTimeOutTimer;
-
-    WEBSOCKETCONNECTED_CALLBACK         OnWebSocketConnected;
-    WEBSOCKETDISCONNECTED_CALLBACK      OnWebSocketDisConnected;
-
-    long long int mSessionID;
+    WEBSOCKET_RECEIVEMESSAGE_CALLBACK      OnWebSocketReceiveMessageCallBack;
+    WEBSOCKET_ERROR_CALLBACK               OnWebSocketErrorCallBack;
+    WEBSOCKET_CONNECTED_CALLBACK           OnWebSocketConnectedCallBack;
+    WEBSOCKET_DISCONNECTED_CALLBACK        OnWebSocketDisConnectedCallBack;
+    WEBSOCKET_HEARTBEATINFO_CALLBACK       OnWebSocketHeartBeatCallBack;
+    WEBSOCKET_TIMEOUT_CALLBACK             OnWebSocketTimeOutCallBack;
 };
 
 #endif // JANUSWEBSOCKET_H

@@ -10,21 +10,15 @@
 #include <vector>
 #include <QObject>
 #include "QtWebrtcStream.h"
-#include "AlvaWebrtcCallBackDefine.h"
 
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
 
-
-namespace webrtc
-{
-    class VideoCaptureModule;
-}  // namespace webrtc
-
-namespace cricket
-{
-    class VideoRenderer;
-}  // namespace cricket
+typedef std::function<void(long long, std::string, std::string)> SENDSDP_CALLBACK;
+typedef std::function<void(long long, std::string, int, std::string)> SENDICECANDIDATE_CALLBACK;
+typedef std::function<void(long long)> ICEGATHERINGCOMPLETE_CALLBACK;
+typedef std::function<void(std::string)> RECVMESSAGE_CALLBACK;
+typedef std::function<void(std::string&)> SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK;
 
 class QtWebrtcRemoteStream : public QObject, public QtWebrtcStream,
     public webrtc::PeerConnectionObserver, public webrtc::CreateSessionDescriptionObserver, public webrtc::DataChannelObserver

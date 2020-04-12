@@ -36,14 +36,7 @@ void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
     unsigned char * yuvBuffer = (unsigned char*)malloc(yuvBufferSize);
 
     RTC_CHECK(yuvBuffer!=nullptr);
-#if 0
-    int ret =  libyuv::I420ToARGB(
-                buffer->DataY(), buffer->StrideY(),
-                buffer->DataU(), buffer->StrideU(),
-                buffer->DataV(), buffer->StrideV(),
-                argbBuffer, buffer->width() * 4,
-                buffer->width(), buffer->height());
-#endif
+
     qDebug() << "width : " << buffer->width() << "    height : " <<   buffer->height();
     memcpy(yuvBuffer, buffer->DataY(), buffer->width() * buffer->height());
     memcpy(yuvBuffer + buffer->width() * buffer->height(), buffer->DataU(), buffer->width() * buffer->height() / 4);

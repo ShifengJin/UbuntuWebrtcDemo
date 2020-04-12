@@ -57,6 +57,7 @@ INCLUDEPATH+=$$PWD/jsoncpp/include
 }
 
 SOURCES += \
+    JsonTools.cpp \
         main.cpp \
         MainWindow.cpp \
     QtWebrtcStream.cpp \
@@ -72,11 +73,10 @@ SOURCES += \
     QtWebrtcRemoteStream.cpp \
     CapturerTrackSource.cpp \
     TestVideoCapture.cpp \
-    VcmCapture.cpp \
-    AlvaJsonTools.cpp \
-    AlvaThreadStateLists.cpp
+    VcmCapture.cpp
 
 HEADERS += \
+    JsonTools.h \
         MainWindow.h \
     QtWebrtcStream.h \
     QtWebRTCVideoFrame.h \
@@ -92,10 +92,7 @@ HEADERS += \
     QtWebrtcRemoteStream.h \
     CapturerTrackSource.h \
     TestVideoCapture.h \
-    VcmCapture.h \
-    AlvaJsonTools.h \
-    AlvaWebrtcCallBackDefine.h \
-    AlvaThreadStateLists.h
+    VcmCapture.h
 
 
 FORMS += \

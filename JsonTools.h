@@ -1,8 +1,19 @@
 #ifndef ALVAJSONTOOLS_H
 #define ALVAJSONTOOLS_H
-
-//#include "json/json.h"
+#include <QString>
+#include <stdint.h>
 #include "json/json.h"
+
+#ifndef INT_MAX
+#define INT_MAX INT32_MAX
+#endif
+#ifndef INT_MIN
+#define INT_MIN INT32_MIN
+#endif
+#ifndef UINT_MAX
+#define UINT_MAX UINT32_MAX
+#endif
+
 
 bool GetIntFromJson(const Json::Value& in, int* out);
 bool GetUIntFromJson(const Json::Value& in, unsigned int* out);
@@ -60,4 +71,9 @@ bool GetDoubleFromJsonObject(const Json::Value& in,
 // Writes out a Json value as a string.
 std::string JsonValueToString(const Json::Value& json);
 
+long long JsonValueToLongLong(const Json::Value &jsonData, std::string k);
+
+QString JsonValueToQString(Json::Value &message);
+
+bool ConvertToJson(const QString &msg, QJsonObject &ret);
 #endif // ALVAJSONTOOLS_H
