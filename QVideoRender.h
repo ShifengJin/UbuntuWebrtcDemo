@@ -44,6 +44,9 @@ private:
 
     int mVideoW, mVideoH;
 
+    int mMaxVideoW = 1920;
+    int mMaxVideoH = 1280;
+
     unsigned char* pBufYuv420p;
 
     bool viewFlag;

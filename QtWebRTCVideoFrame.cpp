@@ -44,6 +44,7 @@ void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
                 argbBuffer, buffer->width() * 4,
                 buffer->width(), buffer->height());
 #endif
+    qDebug() << "width : " << buffer->width() << "    height : " <<   buffer->height();
     memcpy(yuvBuffer, buffer->DataY(), buffer->width() * buffer->height());
     memcpy(yuvBuffer + buffer->width() * buffer->height(), buffer->DataU(), buffer->width() * buffer->height() / 4);
     memcpy(yuvBuffer + buffer->width() * buffer->height() + buffer->width() * buffer->height() / 4, buffer->DataV(), buffer->width() * buffer->height() / 4);

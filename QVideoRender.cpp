@@ -28,6 +28,8 @@ QVideoRender::QVideoRender(QWidget *parent) : QOpenGLWidget(parent)
 
     viewFlag = false;
 
+    pBufYuv420p = new unsigned char[mMaxVideoW * mMaxVideoH * 3 / 2];
+
     this->show();
 }
 
@@ -70,11 +72,8 @@ QVideoRender::~QVideoRender()
 
 void QVideoRender::SetVideoSize(int width, int height)
 {
-    if(pBufYuv420p == nullptr){
-        mVideoW = width;
-        mVideoH = height;
-        pBufYuv420p = new unsigned char[mVideoW * mVideoH * 3 / 2];
-    }
+    mVideoW = width;
+    mVideoH = height;
 }
 
 void QVideoRender::SetYUVData(unsigned char *yuvData)
@@ -230,7 +229,6 @@ void QVideoRender::paintGL()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
 
     glUniform1i(textureUniformY, 0);
     glUniform1i(textureUniformU, 1);
