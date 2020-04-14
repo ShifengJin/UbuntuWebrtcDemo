@@ -1,4 +1,4 @@
-#include "TestVideoCapture.h"
+#include "VideoCapture.h"
 #include <QDebug>
 #include <algorithm>
 #include <webrtc/api/scoped_refptr.h>
@@ -7,7 +7,7 @@
 #include <webrtc/api/video/video_rotation.h>
 #include <webrtc/rtc_base/arraysize.h>
 #include <libyuv/convert_argb.h>
-#include "QVideoRender.h"
+#include "VideoRender.h"
 
 TestVideoCapture::TestVideoCapture(){
 
@@ -19,6 +19,7 @@ TestVideoCapture::~TestVideoCapture(){
 
 void TestVideoCapture::AddOrUpdateSink(rtc::VideoSinkInterface<webrtc::VideoFrame> *sink, const rtc::VideoSinkWants &wants)
 {
+    qDebug() << "AddOrUpdateSink .................";
     broadcaster_.AddOrUpdateSink(sink, wants);
     UpdateVideoAdapter();
 }

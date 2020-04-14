@@ -1,4 +1,4 @@
-#include "QtWebrtcStream.h"
+#include "WebrtcStream.h"
 #include <webrtc/rtc_base/arraysize.h>
 #include <QDebug>
 
@@ -44,6 +44,7 @@ void QtWebrtcStream::SetVideoTrack(rtc::scoped_refptr<webrtc::VideoTrackInterfac
 void QtWebrtcStream::StartView()
 {
     if(mVideoTrack != NULL){
+        qDebug() << "...............";
         mRender = new QtWebRTCVideoFrame(this->mWindowID);
         mVideoTrack->AddOrUpdateSink((rtc::VideoSinkInterface<webrtc::VideoFrame>*)mRender, rtc::VideoSinkWants());
     }

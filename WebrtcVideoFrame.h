@@ -3,16 +3,7 @@
 
 #include <memory>
 #include <webrtc/api/media_stream_interface.h>
-#include "CommonDefine.h"
-/*
- * author      : ShifengJin
- * time        : 20191024
- * create time : 20191024
- * change time : 20191024
- * change list :
- *               @20191024: base
- * note : used to show video frame
- */
+#include "Common.h"
 
 class QtWebRTCVideoFrame : public rtc::VideoSinkInterface<webrtc::VideoFrame>
 {

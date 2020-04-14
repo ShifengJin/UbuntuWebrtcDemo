@@ -1,10 +1,10 @@
-#include "QtConferenceManager.h"
+#include "ConferenceManager.h"
 #include "JsonTools.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <thread>
 
-#include "CommonFunction.h"
+#include "Common.h"
 
 QtConferenceManager* QtConferenceManager::instance = NULL;
 

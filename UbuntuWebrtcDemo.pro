@@ -57,42 +57,41 @@ INCLUDEPATH+=$$PWD/jsoncpp/include
 }
 
 SOURCES += \
+    Common.cpp \
+    ConferenceManager.cpp \
     JsonTools.cpp \
+    VideoCapture.cpp \
+    VideoRender.cpp \
+    WebrtcInterface.cpp \
+    WebrtcRemoteStream.cpp \
+    WebrtcStream.cpp \
+    WebrtcVideoFrame.cpp \
         main.cpp \
         MainWindow.cpp \
-    QtWebrtcStream.cpp \
-    QtWebRTCVideoFrame.cpp \
-    QVideoRender.cpp \
-    WebRTCInterface.cpp \
-    CommonFunction.cpp \
     ConnecttionFactory.cpp \
-    QtConferenceManager.cpp \
     JanusWebSocket.cpp \
     JanusVideoRoomManager.cpp \
     JanusPeerConnection.cpp \
-    QtWebrtcRemoteStream.cpp \
     CapturerTrackSource.cpp \
-    TestVideoCapture.cpp \
     VcmCapture.cpp
 
 HEADERS += \
+    Common.h \
+    ConferenceManager.h \
     JsonTools.h \
         MainWindow.h \
-    QtWebrtcStream.h \
-    QtWebRTCVideoFrame.h \
-    CommonDefine.h \
-    QVideoRender.h \
-    WebRTCInterface.h \
-    CommonFunction.h \
+    VideoCapture.h \
+    VideoRender.h \
     ConnecttionFactory.h \
-    QtConferenceManager.h \
     JanusWebSocket.h \
     JanusVideoRoomManager.h \
     JanusPeerConnection.h \
-    QtWebrtcRemoteStream.h \
     CapturerTrackSource.h \
-    TestVideoCapture.h \
-    VcmCapture.h
+    VcmCapture.h \
+    WebrtcInterface.h \
+    WebrtcRemoteStream.h \
+    WebrtcStream.h \
+    WebrtcVideoFrame.h
 
 
 FORMS += \

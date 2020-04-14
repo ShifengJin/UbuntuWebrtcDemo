@@ -2,7 +2,7 @@
 #define WEBRTCINTERFACE_H
 
 #include <QString>
-#include "CommonDefine.h"
+#include "Common.h"
 
 class WebRTCInterface
 {

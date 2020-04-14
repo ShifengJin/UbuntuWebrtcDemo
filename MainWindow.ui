@@ -73,7 +73,7 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QVideoRender" name="Local_W" native="true">
+   <widget class="VideoRender" name="Local_W" native="true">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -89,7 +89,7 @@
      <string notr="true">background-color: rgb(46, 52, 54);</string>
     </property>
    </widget>
-   <widget class="QVideoRender" name="Remote_W1" native="true">
+   <widget class="VideoRender" name="Remote_W1" native="true">
     <property name="geometry">
      <rect>
       <x>640</x>
@@ -102,7 +102,7 @@
      <string notr="true">background-color: rgb(46, 52, 54);</string>
     </property>
    </widget>
-   <widget class="QVideoRender" name="Remote_W2" native="true">
+   <widget class="VideoRender" name="Remote_W2" native="true">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -115,7 +115,7 @@
      <string notr="true">background-color: rgb(46, 52, 54);</string>
     </property>
    </widget>
-   <widget class="QVideoRender" name="Remote_W3" native="true">
+   <widget class="VideoRender" name="Remote_W3" native="true">
     <property name="geometry">
      <rect>
       <x>640</x>
@@ -133,9 +133,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QVideoRender</class>
+   <class>VideoRender</class>
    <extends>QWidget</extends>
-   <header location="global">QVideoRender.h</header>
+   <header location="global">VideoRender.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

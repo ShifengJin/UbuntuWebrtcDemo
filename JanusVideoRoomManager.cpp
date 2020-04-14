@@ -4,8 +4,7 @@
 
 #include <QDebug>
 #include "JsonTools.h"
-#include "CommonDefine.h"
-#include "CommonFunction.h"
+#include "Common.h"
 #include "JsonTools.h"
 
 JanusVideoRoomManager::JanusVideoRoomManager()

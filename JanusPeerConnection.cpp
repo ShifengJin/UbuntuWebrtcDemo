@@ -1,6 +1,5 @@
 #include "JanusPeerConnection.h"
-#include "CommonDefine.h"
-#include "CommonFunction.h"
+#include "Common.h"
 #include "JsonTools.h"
 #include "JanusVideoRoomManager.h"
 
@@ -222,6 +221,11 @@ void JanusPeerConnection::SendSDP(std::string sdp, std::string type)
 {
     Json::Value msg;
     msg["janus"] = "message";
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
     Json::Value body;
     if(mSubscribeId == 0){
         body["request"] = "configure";
@@ -239,11 +243,6 @@ void JanusPeerConnection::SendSDP(std::string sdp, std::string type)
     msg["body"] = body;
     msg["jsep"] = jsep;
 
-    msg["handle_id"] = (double)mVideoRoomHandleID;
-    QString transaction = GetRandomString(12);
-    msg["transaction"] = transaction.toStdString();
-
-    msg["session_id"] = (double)mSessionID;
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);
@@ -257,6 +256,11 @@ void JanusPeerConnection::SendSDPText(std::string sdp, std::string type)
     Json::Value body;
     body["request"] = "ack";
 
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
 
     Json::Value jsep;
     jsep["type"] = type;
@@ -265,18 +269,10 @@ void JanusPeerConnection::SendSDPText(std::string sdp, std::string type)
     msg["body"] = body;
     msg["jsep"] = jsep;
 
-    msg["handle_id"] = (double)mVideoRoomHandleID;
-    QString transaction = GetRandomString(12);
-    msg["transaction"] = transaction.toStdString();
-
-    msg["session_id"] = (double)mSessionID;
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);
 }
-
-
-
 
 void JanusPeerConnection::requestSetup()
 {
@@ -284,14 +280,15 @@ void JanusPeerConnection::requestSetup()
     msg["janus"] = "message";
     msg["handle_id"] = (double)mVideoRoomHandleID;
 
-    Json::Value body;
-    body["request"] = "setup";
-    msg["body"] = body;
-
     QString transaction = GetRandomString(12);
     msg["transaction"] = transaction.toStdString();
 
     msg["session_id"] = (double)mSessionID;
+
+    Json::Value body;
+    body["request"] = "setup";
+    msg["body"] = body;
+
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);
@@ -301,6 +298,13 @@ void JanusPeerConnection::SendCandidate(QString sdpMid, int sdpMLineIndex, QStri
 {
     Json::Value msg;
     msg["janus"] = "trickle";
+
+    msg["handle_id"] = (double)mVideoRoomHandleID;
+
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
 
     Json::Value candidateObj;
     if(sdpMid == "end")
@@ -315,12 +319,6 @@ void JanusPeerConnection::SendCandidate(QString sdpMid, int sdpMLineIndex, QStri
     }
     msg["candidate"] = candidateObj;
 
-    msg["handle_id"] = (double)mVideoRoomHandleID;
-
-    QString transaction = GetRandomString(12);
-    msg["transaction"] = transaction.toStdString();
-
-    msg["session_id"] = (double)mSessionID;
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);

@@ -1,5 +1,5 @@
 
-#include "QtWebrtcRemoteStream.h"
+#include "WebrtcRemoteStream.h"
 
 #include <memory>
 #include <utility>
@@ -10,8 +10,8 @@
 #include "rtc_base/logging.h"
 
 #include "ConnecttionFactory.h"
-#include "QtConferenceManager.h"
-#include "CommonFunction.h"
+#include "ConferenceManager.h"
+#include "Common.h"
 
 #include "CapturerTrackSource.h"
 

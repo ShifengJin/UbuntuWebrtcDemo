@@ -10,12 +10,12 @@
 #include <QOpenGLTexture>
 
 
-class QVideoRender : public QOpenGLWidget, protected QOpenGLFunctions
+class VideoRender : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    explicit QVideoRender(QWidget *parent = nullptr);
-    virtual ~QVideoRender();
+    explicit VideoRender(QWidget *parent = nullptr);
+    virtual ~VideoRender();
 
     void SetVideoSize(int width, int height);
     void SetYUVData(unsigned char* yuvData);

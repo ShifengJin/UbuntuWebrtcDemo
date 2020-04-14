@@ -5,7 +5,7 @@
 #include <webrtc/absl/memory/memory.h>
 #include <webrtc/pc/video_track_source.h>
 #include "VcmCapture.h"
-#include "QtWebRTCVideoFrame.h"
+#include "WebrtcVideoFrame.h"
 
 class CapturerTrackSource : public webrtc::VideoTrackSource {
  public:

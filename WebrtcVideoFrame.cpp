@@ -1,11 +1,11 @@
-#include "QtWebRTCVideoFrame.h"
+#include "WebrtcVideoFrame.h"
 
 #include <QDebug>
 
 #include <webrtc/api/video/i420_buffer.h>
 #include <webrtc/rtc_base/arraysize.h>
 #include <libyuv/convert_argb.h>
-#include "QVideoRender.h"
+#include "VideoRender.h"
 
 QtWebRTCVideoFrame::QtWebRTCVideoFrame(unsigned long iWindowID)
 {
@@ -24,7 +24,7 @@ void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
         buffer = webrtc::I420Buffer::Rotate(*buffer, iFrame.rotation());
     }
 
-    QVideoRender *paintWidget = (QVideoRender*)QWidget::find(mWindowID);;
+    VideoRender *paintWidget = (VideoRender*)QWidget::find(mWindowID);;
 
     if(paintWidget == nullptr)
     {

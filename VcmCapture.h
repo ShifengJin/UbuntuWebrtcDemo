@@ -6,7 +6,7 @@
 
 #include <webrtc/api/scoped_refptr.h>
 #include <webrtc/modules/video_capture/video_capture.h>
-#include "TestVideoCapture.h"
+#include "VideoCapture.h"
 
 #define ALVA_WEBRTC_USE_WEBRTCCAPTURE 1
 

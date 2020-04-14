@@ -1,12 +1,11 @@
-#include "CommonFunction.h"
+#include "Common.h"
 #include "JsonTools.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "CommonDefine.h"
 #include <QDebug>
 #include <QCloseEvent>
 #include <QShowEvent>
-#include "WebRTCInterface.h"
+#include "WebrtcInterface.h"
 #include "CapturerTrackSource.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,8 +42,8 @@ void MainWindow::onOnJoinButtonClicked()
     QString serverUrl = ui->Url_LE->text();
     qDebug() << "onOnJoinButtonClicked ...." << serverUrl;
 
-    //AlvaCapturerTrackSource::GetInstall()->getCapturerTrackSource()->GetCapturer()->SetWindowID(this->localWindowID);
-    //AlvaCapturerTrackSource::GetInstall()->CreateVideoTrackAndAudioTrack();
+    AlvaCapturerTrackSource::GetInstall()->getCapturerTrackSource()->GetCapturer()->SetWindowID(this->localWindowID);
+    AlvaCapturerTrackSource::GetInstall()->CreateVideoTrackAndAudioTrack();
 
     WebRTCInterface::GetInstance()->Login(serverUrl);
 }

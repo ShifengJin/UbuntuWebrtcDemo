@@ -1,8 +1,8 @@
-#include "QVideoRender.h"
+#include "VideoRender.h"
 #include <QDebug>
 #include <QPainter>
 
-QVideoRender::QVideoRender(QWidget *parent) : QOpenGLWidget(parent)
+VideoRender::VideoRender(QWidget *parent) : QOpenGLWidget(parent)
 {
     program = nullptr;
 
@@ -33,7 +33,7 @@ QVideoRender::QVideoRender(QWidget *parent) : QOpenGLWidget(parent)
     this->show();
 }
 
-QVideoRender::~QVideoRender()
+VideoRender::~VideoRender()
 {
     if(pBufYuv420p){
         delete[] pBufYuv420p;
@@ -70,20 +70,20 @@ QVideoRender::~QVideoRender()
     }
 }
 
-void QVideoRender::SetVideoSize(int width, int height)
+void VideoRender::SetVideoSize(int width, int height)
 {
     mVideoW = width;
     mVideoH = height;
 }
 
-void QVideoRender::SetYUVData(unsigned char *yuvData)
+void VideoRender::SetYUVData(unsigned char *yuvData)
 {
     mMutex.lock();
     memcpy(pBufYuv420p, yuvData, mVideoW * mVideoH * 3 / 2);
     mMutex.unlock();
 }
 
-void QVideoRender::SetViewStated(bool flag)
+void VideoRender::SetViewStated(bool flag)
 {
     viewFlag = flag;
     if(viewFlag){
@@ -91,7 +91,7 @@ void QVideoRender::SetViewStated(bool flag)
     }
 }
 
-void QVideoRender::initializeGL()
+void VideoRender::initializeGL()
 {
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
@@ -190,12 +190,12 @@ void QVideoRender::initializeGL()
     glClearColor(0.f, 0.f, 0.f, 0.f);
 }
 
-void QVideoRender::resizeGL(int w, int h)
+void VideoRender::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
 }
 
-void QVideoRender::paintGL()
+void VideoRender::paintGL()
 {
     if(!viewFlag){
         return;

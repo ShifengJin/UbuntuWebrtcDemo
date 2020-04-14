@@ -11,7 +11,7 @@
 #include <webrtc/video/video_stream_decoder.h>
 #include <webrtc/video/video_stream_encoder.h>
 
-#include "QVideoRender.h"
+#include "VideoRender.h"
 
 VcmCapture::~VcmCapture()
 {
@@ -20,6 +20,8 @@ VcmCapture::~VcmCapture()
 
 void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
 {
+
+    qDebug() << "============================> OnFrame";
     // 此处可以作为回调函数使用
     // ------------------------------------------------
     rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(frame.video_frame_buffer()->ToI420());
@@ -27,7 +29,7 @@ void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
         buffer = webrtc::I420Buffer::Rotate(*buffer, frame.rotation());
     }
 
-    QVideoRender *paintWidget = (QVideoRender*)QWidget::find(mWindowID);;
+    VideoRender *paintWidget = (VideoRender*)QWidget::find(mWindowID);
 
     if(paintWidget == nullptr)
     {
@@ -35,28 +37,6 @@ void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
        return;
     }
 
-#if 0
-    int argbBufferSize = frame.height() * frame.width() * 4;
-    unsigned char * argbBuffer = (unsigned char*)malloc(argbBufferSize);
-
-    RTC_CHECK(argbBuffer!=nullptr);
-    //RTC_LOG(INFO) << "strideY : " << buffer->StrideY();
-    //RTC_LOG(INFO) << "strideU : " << buffer->StrideU();
-    //RTC_LOG(INFO) << "strideV : " << buffer->StrideV();
-    int ret =  libyuv::I420ToARGB(
-                buffer->DataY(), buffer->StrideY(),
-                buffer->DataU(), buffer->StrideU(),
-                buffer->DataV(), buffer->StrideV(),
-                argbBuffer, buffer->width() * 4,
-                buffer->width(), buffer->height());
-
-    paintWidget->RenderARGBVideo(argbBuffer, buffer->width(), buffer->height());
-
-    if(argbBuffer != nullptr){
-        free(argbBuffer);
-        argbBuffer = nullptr;
-    }
-#endif
     int yuvBufferSize = buffer->width() * buffer->height() * 3 / 2;
     unsigned char * yuvBuffer = (unsigned char*)malloc(yuvBufferSize);
 
@@ -75,7 +55,6 @@ void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
     }
 
     // ------------------------------------------------
-    //RTC_LOG(INFO) << "============================> OnFrame";
     TestVideoCapture::OnFrame(frame);
 }
 #if ALVA_WEBRTC_USE_WEBRTCCAPTURE
@@ -112,29 +91,32 @@ bool VcmCapture::Init(size_t width, size_t height, size_t target_fps, size_t cap
 
     char device_name[256];
     char unique_name[256];
-
+    qDebug() << "111111";
     if(device_info->GetDeviceName(static_cast<uint32_t>(capture_device_index),
                                   device_name, sizeof(device_name), unique_name, sizeof(unique_name)) != 0){
         Destroy();
         return false;
     }
+    qDebug() << "1111112";
     vcm_ = webrtc::VideoCaptureFactory::Create(unique_name);
     if(!vcm_){
         return false;
     }
+    qDebug() << "1111113";
     vcm_->RegisterCaptureDataCallback(this);
-
+    qDebug() << "1111114";
     device_info->GetCapability(vcm_->CurrentDeviceName(), 0, capability_);
-
+    qDebug() << "1111115";
     capability_.width = static_cast<int32_t>(width);
     capability_.height = static_cast<int32_t>(height);
     capability_.maxFPS = static_cast<int32_t>(target_fps);
     capability_.videoType = webrtc::VideoType::kI420;
-
+    qDebug() << "1111116";
     if(vcm_->StartCapture(capability_) != 0){
         Destroy();
         return false;
     }
+    qDebug() << "1111117";
 #else
     m_capture = new cv::VideoCapture(capture_device_index);
     if(!m_capture->isOpened()){

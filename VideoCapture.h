@@ -9,7 +9,7 @@
 #include <webrtc/media/base/video_broadcaster.h>
 #include <webrtc/api/media_stream_interface.h>
 
-#include "CommonDefine.h"
+#include "Common.h"
 
 class TestVideoCapture : public rtc::VideoSourceInterface<webrtc::VideoFrame>
 {
@@ -21,7 +21,6 @@ public:
                          const rtc::VideoSinkWants& wants) override;
 
     void RemoveSink(rtc::VideoSinkInterface<webrtc::VideoFrame>* sink) override;
-
 
 protected:
     void OnFrame(const webrtc::VideoFrame& frame);

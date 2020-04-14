@@ -1,6 +1,6 @@
-#include "WebRTCInterface.h"
-#include "CommonDefine.h"
-#include "QtConferenceManager.h"
+#include "WebrtcInterface.h"
+#include "Common.h"
+#include "ConferenceManager.h"
 
 WebRTCInterface* WebRTCInterface::Instance = NULL;
 

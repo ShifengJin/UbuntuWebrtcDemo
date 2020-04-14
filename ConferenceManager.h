@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "JanusVideoRoomManager.h"
-#include "QtWebrtcRemoteStream.h"
+#include "WebrtcRemoteStream.h"
 
 class QtConferenceManager : public QObject
 {

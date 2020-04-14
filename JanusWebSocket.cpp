@@ -3,8 +3,7 @@
 #include <QDebug>
 #include <QTimer>
 
-#include "CommonFunction.h"
-#include "CommonDefine.h"
+#include "Common.h"
 
 #include "JsonTools.h"
 

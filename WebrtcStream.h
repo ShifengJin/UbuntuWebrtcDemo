@@ -2,8 +2,8 @@
 #define QTWEBRTCSTREAM_H
 
 #include <webrtc/api/media_stream_interface.h>
-#include "QtWebRTCVideoFrame.h"
-#include "CommonDefine.h"
+#include "WebrtcVideoFrame.h"
+#include "Common.h"
 
 /*
  * author      : ShifengJin
