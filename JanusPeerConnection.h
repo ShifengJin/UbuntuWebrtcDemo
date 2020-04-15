@@ -40,9 +40,6 @@ private:
 
     void createVideoRoom();
     void createTextRoom();
-
-
-    void requestSetup();
 private:
     void               *pVideoRoomManager;
     JanusWebSocket     *pWebSocket;

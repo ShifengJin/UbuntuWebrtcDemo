@@ -37,11 +37,8 @@ public:
     void SetIsLocal(bool inIsLocal) {isLocal = inIsLocal;}
     bool GetIsLocal(){return isLocal;}
 
-    void RegisterSendLocalSDP_CallBack(const SENDSDP_CALLBACK &callback);
-    void RegisterSendIceCandidate_callBack(SENDICECANDIDATE_CALLBACK callback);
-    void RegisterIceGatheringComplete_callBack(ICEGATHERINGCOMPLETE_CALLBACK callback);
-    void RegisterRecvMessage_callBack(RECVMESSAGE_CALLBACK callback);
-    void RegisterSendLocalInfoWhenOpenDataChannel_callBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback);
+    void RegisterRecvMessageCallBack(RECVMESSAGE_CALLBACK callback);
+    void RegisterSendLocalInfoWhenOpenDataChannelCallBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback);
 
 public Q_SLOTS:
 
@@ -88,9 +85,6 @@ private Q_SLOTS:
     void on_peerConnection_removeTrack(webrtc::MediaStreamTrackInterface* track);
 
 public:
-    SENDSDP_CALLBACK              OnLocalSDPReady = nullptr;
-    SENDICECANDIDATE_CALLBACK     OnSendIceCandidate = nullptr;
-    ICEGATHERINGCOMPLETE_CALLBACK OnIceGatheringComplete = nullptr;
     RECVMESSAGE_CALLBACK          OnRecvMessage = nullptr;
     SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK    OnSendLocalInfoWhenOpenDataChannel;
 

@@ -234,7 +234,7 @@ void JanusPeerConnection::SendSDP(std::string sdp, std::string type)
         body["video"] = true;
     }else{
         body["request"] = "start";
-        body["room"] = 1234;
+        body["room"] = mVideoRoomId;
     }
 
     Json::Value jsep;
@@ -269,27 +269,6 @@ void JanusPeerConnection::SendSDPText(std::string sdp, std::string type)
 
     msg["body"] = body;
     msg["jsep"] = jsep;
-
-
-    QString SendMsg = JsonValueToQString(msg);
-    pWebSocket->SendMessage(SendMsg);
-}
-
-void JanusPeerConnection::requestSetup()
-{
-    Json::Value msg;
-    msg["janus"] = "message";
-    msg["handle_id"] = (double)mVideoRoomHandleID;
-
-    QString transaction = GetRandomString(12);
-    msg["transaction"] = transaction.toStdString();
-
-    msg["session_id"] = (double)mSessionID;
-
-    Json::Value body;
-    body["request"] = "setup";
-    msg["body"] = body;
-
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);

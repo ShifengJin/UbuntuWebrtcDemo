@@ -37,7 +37,6 @@ void WebrtcVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
 
     RTC_CHECK(yuvBuffer!=nullptr);
 
-    qDebug() << "width : " << buffer->width() << "    height : " <<   buffer->height();
     memcpy(yuvBuffer, buffer->DataY(), buffer->width() * buffer->height());
     memcpy(yuvBuffer + buffer->width() * buffer->height(), buffer->DataU(), buffer->width() * buffer->height() / 4);
     memcpy(yuvBuffer + buffer->width() * buffer->height() + buffer->width() * buffer->height() / 4, buffer->DataV(), buffer->width() * buffer->height() / 4);

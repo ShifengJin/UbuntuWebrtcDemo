@@ -2,7 +2,6 @@
 #include "JsonTools.h"
 #include <sys/types.h>
 #include <unistd.h>
-#include <thread>
 
 #include "Common.h"
 
@@ -77,8 +76,6 @@ void ConferenceManager::sendICEs(long long id, QVector<ConferenceManager::iceCan
 
 void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnect, bool isLocal)
 {
-    qDebug() << __FILE__ << "  " << __FUNCTION__ << "  " << __LINE__ << "ConnectToPeer";
-    qDebug() << __FILE__ << "  " << __FUNCTION__ << "  " << __LINE__ << "isConnect : " << isConnect;
     rtc::scoped_refptr<WebrtcRemoteStream> remoteStream = new rtc::RefCountedObject<WebrtcRemoteStream>(peerId);
     remoteStream->SetIsLocal(isLocal);
 
@@ -86,14 +83,11 @@ void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnec
         LocalStream = remoteStream;
     }
 
-
     connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
-    //remoteStream->RegisterSendLocalSDP_CallBack(std::bind(&ConferenceManager::onLocalSDP, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    //remoteStream->OnSendSDP = std::bind(&ConferenceManager::onLocalSDP, this, std::placeholders::_1);
     connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
     connect(remoteStream, SIGNAL(IceGatheringComplete(long long)), this, SLOT(onIceGatheringComplete(long long)));
 
-    remoteStream->RegisterSendLocalInfoWhenOpenDataChannel_callBack(std::bind(&ConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
+    remoteStream->RegisterSendLocalInfoWhenOpenDataChannelCallBack(std::bind(&ConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
 
     addStreamInfo(remoteStream);
 

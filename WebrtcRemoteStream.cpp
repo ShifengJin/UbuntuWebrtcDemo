@@ -71,27 +71,12 @@ bool WebrtcRemoteStream::SendDataViaDataChannel(const std::string &data)
     return true;
 }
 
-void WebrtcRemoteStream::RegisterSendLocalSDP_CallBack(const SENDSDP_CALLBACK &callback)
-{
-    OnLocalSDPReady = callback;
-}
-
-void WebrtcRemoteStream::RegisterSendIceCandidate_callBack(SENDICECANDIDATE_CALLBACK callback)
-{
-    OnSendIceCandidate = callback;
-}
-
-void WebrtcRemoteStream::RegisterIceGatheringComplete_callBack(ICEGATHERINGCOMPLETE_CALLBACK callback)
-{
-    OnIceGatheringComplete = callback;
-}
-
-void WebrtcRemoteStream::RegisterRecvMessage_callBack(RECVMESSAGE_CALLBACK callback)
+void WebrtcRemoteStream::RegisterRecvMessageCallBack(RECVMESSAGE_CALLBACK callback)
 {
     OnRecvMessage = callback;
 }
 
-void WebrtcRemoteStream::RegisterSendLocalInfoWhenOpenDataChannel_callBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback)
+void WebrtcRemoteStream::RegisterSendLocalInfoWhenOpenDataChannelCallBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback)
 {
     OnSendLocalInfoWhenOpenDataChannel = callback;
 }
@@ -133,7 +118,6 @@ bool WebrtcRemoteStream::createPeerConnection(bool dtls)
     webrtc::PeerConnectionInterface::IceServer server;
     // 需要提供接口
     std::string serverUrl = GetPeerConnectionString();
-    qDebug() << "=================================> serverUrl : " << QString::fromStdString(serverUrl);
     server.uri = serverUrl;
     config.servers.push_back(server);
 
@@ -154,34 +138,6 @@ void WebrtcRemoteStream::addTracks()
     {
         return;//Already added tracks.
     }
-#if 0
-    auto result_or_error = mPeerConnection->AddTrack(QtWebrtcLocalStream::Get()->GetAudioTrack(),{kStreamId});
-    //auto result_or_error = mPeerConnection->AddTrack(CapturerTrackSource::Instance()->GetAudioTrack(),{kStreamId});
-    if(!result_or_error.ok())
-    {
-        RTC_LOG(LS_ERROR) << "Failed to add audio track to PeerConnection:"
-                          <<result_or_error.error().message();
-    }
-
-    result_or_error = mPeerConnection->AddTrack(QtWebrtcLocalStream::Get()->GetVideoTrack(),{kStreamId});
-    //result_or_error = mPeerConnection->AddTrack(CapturerTrackSource::Instance()->GetVideoTrack(),{kStreamId});
-    if(!result_or_error.ok())
-    {
-        RTC_LOG(LS_ERROR) << "Failed to add video track to PeerConnection:"
-                          << result_or_error.error().message();
-    }
-#elif 0
-    rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
-          ConnecttionFactory::Get()->CreateLocalMediaStream(kStreamId);
-    rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track = CapturerTrackSource::Instance()->GetAudioTrack();
-    rtc::scoped_refptr<webrtc::VideoTrackInterface> video_track = CapturerTrackSource::Instance()->GetVideoTrack();
-    stream->AddTrack(audio_track);
-    stream->AddTrack(video_track);
-
-    //stream->GetVideoTracks()[0]->AddOrUpdateSink(CapturerTrackSource::Instance()->GetCapturer().get(), rtc::VideoSinkWants());
-
-    mPeerConnection->AddStream(stream);
-#elif 1
     auto result_or_error = mPeerConnection->AddTrack(CapturerTrackSource::GetInstall()->GetAudioTrack(),{kStreamId});
     if(!result_or_error.ok())
     {
@@ -195,18 +151,6 @@ void WebrtcRemoteStream::addTracks()
         RTC_LOG(LS_ERROR) << "Failed to add video track to PeerConnection:"
                           << result_or_error.error().message();
     }
-#else
-    rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
-          ConnecttionFactory::Get()->CreateLocalMediaStream(kStreamId);
-    rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track = AlvaCapturerTrackSource::GetInstall()->GetAudioTrack();
-    rtc::scoped_refptr<webrtc::VideoTrackInterface> video_track = AlvaCapturerTrackSource::GetInstall()->GetVideoTrack();
-    stream->AddTrack(audio_track);
-    stream->AddTrack(video_track);
-
-    //stream->GetVideoTracks()[0]->AddOrUpdateSink(CapturerTrackSource::Instance()->GetCapturer().get(), rtc::VideoSinkWants());
-
-    mPeerConnection->AddStream(stream);
-#endif
 }
 
 void WebrtcRemoteStream::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
