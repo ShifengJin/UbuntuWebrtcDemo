@@ -6,39 +6,39 @@
 
 #include "Common.h"
 
-QtConferenceManager* QtConferenceManager::instance = NULL;
+ConferenceManager* ConferenceManager::instance = NULL;
 
-QtConferenceManager::QtConferenceManager(QObject *parent) : QObject(parent)
+ConferenceManager::ConferenceManager(QObject *parent) : QObject(parent)
 {
-    mJanusVideoRoomManager.RegisterConnectToPeerCallBack(std::bind(&QtConferenceManager::ConnectToPeer, this,
+    mJanusVideoRoomManager.RegisterConnectToPeerCallBack(std::bind(&ConferenceManager::ConnectToPeer, this,
                                                                     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteSdpCallBack(std::bind(&QtConferenceManager::onRetmoeSDP, this,
+    mJanusVideoRoomManager.RegisterRemoteSdpCallBack(std::bind(&ConferenceManager::onRetmoeSDP, this,
                                                                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteStreamRemoveCallBack(std::bind(&QtConferenceManager::onRemoteStreamRemove, this,
+    mJanusVideoRoomManager.RegisterRemoteStreamRemoveCallBack(std::bind(&ConferenceManager::onRemoteStreamRemove, this,
                                                                          std::placeholders::_1));
 }
 
-QtConferenceManager::~QtConferenceManager()
+ConferenceManager::~ConferenceManager()
 {
 
 }
 
-QtConferenceManager *QtConferenceManager::GetInstance()
+ConferenceManager *ConferenceManager::GetInstance()
 {
     if(instance == NULL){
-        instance = new QtConferenceManager();
+        instance = new ConferenceManager();
     }
     return instance;
 }
 
-void QtConferenceManager::Login(std::string &server)
+void ConferenceManager::Login(std::string &server)
 {
     mJanusVideoRoomManager.ConnectServer(server);
 }
 
-void QtConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned long> remote)
+void ConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned long> remote)
 {
     mLocalWindow = local;
     mRemoteWinds.clear();
@@ -47,12 +47,12 @@ void QtConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned 
     }
 }
 
-rtc::scoped_refptr<QtWebrtcRemoteStream> QtConferenceManager::GetLocalWebrtcRemoteStream()
+rtc::scoped_refptr<WebrtcRemoteStream> ConferenceManager::GetLocalWebrtcRemoteStream()
 {
     return LocalStream;
 }
 
-void QtConferenceManager::addStreamInfo(rtc::scoped_refptr<QtWebrtcRemoteStream> remoteStream)
+void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream)
 {
     RemoteStreamInfo stream;
     stream.stream = remoteStream;
@@ -65,7 +65,7 @@ void QtConferenceManager::addStreamInfo(rtc::scoped_refptr<QtWebrtcRemoteStream>
     mRemoteStreamInfos[peerId] = stream;
 }
 
-void QtConferenceManager::sendICEs(long long id, QVector<QtConferenceManager::iceCandidate> &iceCandidateList)
+void ConferenceManager::sendICEs(long long id, QVector<ConferenceManager::iceCandidate> &iceCandidateList)
 {
     while(iceCandidateList.count() > 0)
     {
@@ -75,11 +75,11 @@ void QtConferenceManager::sendICEs(long long id, QVector<QtConferenceManager::ic
     }
 }
 
-void QtConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnect, bool isLocal)
+void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnect, bool isLocal)
 {
     qDebug() << __FILE__ << "  " << __FUNCTION__ << "  " << __LINE__ << "ConnectToPeer";
     qDebug() << __FILE__ << "  " << __FUNCTION__ << "  " << __LINE__ << "isConnect : " << isConnect;
-    rtc::scoped_refptr<QtWebrtcRemoteStream> remoteStream = new rtc::RefCountedObject<QtWebrtcRemoteStream>(peerId);
+    rtc::scoped_refptr<WebrtcRemoteStream> remoteStream = new rtc::RefCountedObject<WebrtcRemoteStream>(peerId);
     remoteStream->SetIsLocal(isLocal);
 
     if(isLocal){
@@ -88,12 +88,12 @@ void QtConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConn
 
 
     connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
-    //remoteStream->RegisterSendLocalSDP_CallBack(std::bind(&QtConferenceManager::onLocalSDP, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    //remoteStream->OnSendSDP = std::bind(&QtConferenceManager::onLocalSDP, this, std::placeholders::_1);
+    //remoteStream->RegisterSendLocalSDP_CallBack(std::bind(&ConferenceManager::onLocalSDP, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    //remoteStream->OnSendSDP = std::bind(&ConferenceManager::onLocalSDP, this, std::placeholders::_1);
     connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
     connect(remoteStream, SIGNAL(IceGatheringComplete(long long)), this, SLOT(onIceGatheringComplete(long long)));
 
-    remoteStream->RegisterSendLocalInfoWhenOpenDataChannel_callBack(std::bind(&QtConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
+    remoteStream->RegisterSendLocalInfoWhenOpenDataChannel_callBack(std::bind(&ConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
 
     addStreamInfo(remoteStream);
 
@@ -112,7 +112,7 @@ void QtConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConn
     }
 }
 
-void QtConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
+void ConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
 {
     auto itr = mRemoteStreamInfos.find(id);
 
@@ -124,10 +124,10 @@ void QtConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
     }
 }
 
-void QtConferenceManager::onRetmoeIce(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate)
+void ConferenceManager::onRetmoeIce(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate)
 {
     qDebug()<<"===========================================";
-    qDebug()<<"======QtConferenceManager::onRetmoeIce=====";
+    qDebug()<<"======ConferenceManager::onRetmoeIce=====";
     qDebug()<<"===========================================";
 
     auto itr = mRemoteStreamInfos.find(id);
@@ -146,7 +146,7 @@ void QtConferenceManager::onRetmoeIce(long long id, QString sdp_mid, int sdp_mli
     remoteStream->AddPeerIceCandidate(sdp_mid, sdp_mlineindex, candidate);
 }
 
-void QtConferenceManager::onLocalIceCandidate(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate)
+void ConferenceManager::onLocalIceCandidate(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate)
 {
     auto itr = mRemoteStreamInfos.find(id);
     if(itr == mRemoteStreamInfos.end()){
@@ -165,7 +165,7 @@ void QtConferenceManager::onLocalIceCandidate(long long id, QString sdp_mid, int
     }
 }
 
-void QtConferenceManager::onRetmoeSDP(long long id, std::string type, std::string sdp, bool isTextRoom)
+void ConferenceManager::onRetmoeSDP(long long id, std::string type, std::string sdp, bool isTextRoom)
 {
 
     auto itr = mRemoteStreamInfos.find(id);
@@ -189,7 +189,7 @@ void QtConferenceManager::onRetmoeSDP(long long id, std::string type, std::strin
     remoteStream->SetPeerSDP(type, sdp);
 }
 
-void QtConferenceManager::onRemoteStreamRemove(long long streamId)
+void ConferenceManager::onRemoteStreamRemove(long long streamId)
 {
     auto itr = mRemoteStreamInfos.find(streamId);
     if(itr != mRemoteStreamInfos.end())
@@ -208,12 +208,12 @@ void QtConferenceManager::onRemoteStreamRemove(long long streamId)
     }
 }
 
-void QtConferenceManager::onIceGatheringComplete(long long id)
+void ConferenceManager::onIceGatheringComplete(long long id)
 {
     onLocalIceCandidate(id, "end", -1, "end");
 }
 
-void QtConferenceManager::onSendLocalInfoWhenOpenDataChannel(std::string &data)
+void ConferenceManager::onSendLocalInfoWhenOpenDataChannel(std::string &data)
 {
     Json::Value msg;
     msg["textroom"] = "join";

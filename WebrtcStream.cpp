@@ -2,12 +2,12 @@
 #include <webrtc/rtc_base/arraysize.h>
 #include <QDebug>
 
-QtWebrtcStream::QtWebrtcStream()
+WebrtcStream::WebrtcStream()
 {
 
 }
 
-QtWebrtcStream::~QtWebrtcStream()
+WebrtcStream::~WebrtcStream()
 {
     this->StopView();
     mAudioTrack = NULL;
@@ -16,41 +16,40 @@ QtWebrtcStream::~QtWebrtcStream()
     mWindowID = -1;
 }
 
-rtc::scoped_refptr<webrtc::VideoTrackInterface> QtWebrtcStream::GetVideoTrack()
+rtc::scoped_refptr<webrtc::VideoTrackInterface> WebrtcStream::GetVideoTrack()
 {
     return mVideoTrack;
 }
 
-rtc::scoped_refptr<webrtc::AudioTrackInterface> QtWebrtcStream::GetAudioTrack()
+rtc::scoped_refptr<webrtc::AudioTrackInterface> WebrtcStream::GetAudioTrack()
 {
     return mAudioTrack;
 }
 
-void QtWebrtcStream::SetWindowID(unsigned long iWindowID)
+void WebrtcStream::SetWindowID(unsigned long iWindowID)
 {
     this->mWindowID = iWindowID;
 }
 
-unsigned long QtWebrtcStream::GetWindowID()
+unsigned long WebrtcStream::GetWindowID()
 {
     return this->mWindowID;
 }
 
-void QtWebrtcStream::SetVideoTrack(rtc::scoped_refptr<webrtc::VideoTrackInterface> iVideoTrack)
+void WebrtcStream::SetVideoTrack(rtc::scoped_refptr<webrtc::VideoTrackInterface> iVideoTrack)
 {
     this->mVideoTrack = iVideoTrack;
 }
 
-void QtWebrtcStream::StartView()
+void WebrtcStream::StartView()
 {
     if(mVideoTrack != NULL){
-        qDebug() << "...............";
-        mRender = new QtWebRTCVideoFrame(this->mWindowID);
+        mRender = new WebrtcVideoFrame(this->mWindowID);
         mVideoTrack->AddOrUpdateSink((rtc::VideoSinkInterface<webrtc::VideoFrame>*)mRender, rtc::VideoSinkWants());
     }
 }
 
-void QtWebrtcStream::StopView()
+void WebrtcStream::StopView()
 {
     if(mVideoTrack != NULL){
         mVideoTrack->RemoveSink((rtc::VideoSinkInterface<webrtc::VideoFrame>*)mRender);

@@ -22,10 +22,10 @@
 
 
 #if ALVA_WEBRTC_USE_WEBRTCCAPTURE
-class VcmCapture : public TestVideoCapture,
+class VcmCapture : public VideoCapture,
                    public rtc::VideoSinkInterface<webrtc::VideoFrame>
 #else
-class VcmCapture : public TestVideoCapture
+class VcmCapture : public VideoCapture
 #endif
 {
 public:

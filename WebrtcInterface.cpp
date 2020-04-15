@@ -12,7 +12,7 @@ WebRTCInterface::WebRTCInterface()
 void WebRTCInterface::Login(QString serverUrl)
 {
     std::string url = QTSTR_TO_STDSTR(serverUrl);
-    QtConferenceManager::GetInstance()->Login(url);
+    ConferenceManager::GetInstance()->Login(url);
 }
 
 void WebRTCInterface::Logout()
@@ -30,10 +30,10 @@ WebRTCInterface *WebRTCInterface::GetInstance()
 
 void WebRTCInterface::SetVideoWindows(unsigned long localWindow, QVector<unsigned long> remoteWindowID)
 {
-    QtConferenceManager::GetInstance()->SetVideoWindows(localWindow, remoteWindowID);
+    ConferenceManager::GetInstance()->SetVideoWindows(localWindow, remoteWindowID);
 }
 
 void WebRTCInterface::SendMessage(std::string message)
 {
-    QtConferenceManager::GetInstance()->GetLocalWebrtcRemoteStream()->SendDataViaDataChannel(message);
+    ConferenceManager::GetInstance()->GetLocalWebrtcRemoteStream()->SendDataViaDataChannel(message);
 }

@@ -1,5 +1,5 @@
-#ifndef CAAPTURERTRACKSOURCE_H
-#define CAAPTURERTRACKSOURCE_H
+#ifndef CAPTURERTRACKSOURCE_H
+#define CAPTURERTRACKSOURCE_H
 
 #include <utility>
 #include <webrtc/absl/memory/memory.h>
@@ -7,9 +7,9 @@
 #include "VcmCapture.h"
 #include "WebrtcVideoFrame.h"
 
-class CapturerTrackSource : public webrtc::VideoTrackSource {
+class CapturerTrackSourceBase : public webrtc::VideoTrackSource {
  public:
-  CapturerTrackSource();
+  CapturerTrackSourceBase();
 
   VcmCapture* GetCapturer(){return capturer_;}
 
@@ -20,11 +20,11 @@ private:
   VcmCapture* capturer_;
 };
 
-class AlvaCapturerTrackSource
+class CapturerTrackSource
 {
 public:
 
-    AlvaCapturerTrackSource();
+    CapturerTrackSource();
 
     void CreateVideoTrackAndAudioTrack();
 
@@ -32,18 +32,18 @@ public:
 
     rtc::scoped_refptr<webrtc::AudioTrackInterface> GetAudioTrack();
 
-    static AlvaCapturerTrackSource* GetInstall();
+    static CapturerTrackSource* GetInstall();
 
-    rtc::scoped_refptr<CapturerTrackSource> getCapturerTrackSource(){return mCapturerTrackSource;}
+    rtc::scoped_refptr<CapturerTrackSourceBase> getCapturerTrackSource(){return mCapturerTrackSource;}
 
 private:
 
     rtc::scoped_refptr<webrtc::VideoTrackInterface> mVideoTrack;
     rtc::scoped_refptr<webrtc::AudioTrackInterface> mAudioTrack;
-    rtc::scoped_refptr<CapturerTrackSource>       mCapturerTrackSource;
+    rtc::scoped_refptr<CapturerTrackSourceBase>       mCapturerTrackSource;
 
-    static AlvaCapturerTrackSource* install;
+    static CapturerTrackSource* install;
 
 };
 
-#endif // CAAPTURERTRACKSOURCE_H
+#endif // CAPTURERTRACKSOURCE_H

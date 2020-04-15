@@ -7,17 +7,17 @@
 #include <libyuv/convert_argb.h>
 #include "VideoRender.h"
 
-QtWebRTCVideoFrame::QtWebRTCVideoFrame(unsigned long iWindowID)
+WebrtcVideoFrame::WebrtcVideoFrame(unsigned long iWindowID)
 {
     this->mWindowID = iWindowID;
 }
 
-QtWebRTCVideoFrame::~QtWebRTCVideoFrame()
+WebrtcVideoFrame::~WebrtcVideoFrame()
 {
     this->mWindowID = -1;
 }
 
-void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
+void WebrtcVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
 {
     rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(iFrame.video_frame_buffer()->ToI420());
     if(iFrame.rotation() != webrtc::kVideoRotation_0){
@@ -52,12 +52,12 @@ void QtWebRTCVideoFrame::OnFrame(const webrtc::VideoFrame &iFrame)
     }
 }
 
-unsigned long QtWebRTCVideoFrame::GetWindowID() const
+unsigned long WebrtcVideoFrame::GetWindowID() const
 {
     return this->mWindowID;
 }
 
-void QtWebRTCVideoFrame::SetWindowID(unsigned long iWindowID)
+void WebrtcVideoFrame::SetWindowID(unsigned long iWindowID)
 {
     this->mWindowID = iWindowID;
 }

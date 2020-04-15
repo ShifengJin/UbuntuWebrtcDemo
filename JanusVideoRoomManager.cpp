@@ -110,7 +110,6 @@ void JanusVideoRoomManager::onWebSocketReceivedMessage(QString message)
             }else{
                 ret = GetStringFromJsonObject(dataObj, "textroom", &janusEvent);
                 if(ret){
-                    qDebug() << "111111111111111111111111111111111111111111";
                     onTextRoomEvent("eventevent", object);
                 }
             }
@@ -148,12 +147,11 @@ void JanusVideoRoomManager::createSessionId()
 void JanusVideoRoomManager::onCreateSessionId(const Json::Value &recvmsg)
 {
     mSessionId = JsonValueToLongLong(recvmsg, "id");
-    qDebug() << "sessionId : " << mSessionId;
 
     //CreateVideoRoom(mVideoRoomID);
     //CreateTextRoom(mTextRoomID);
 
-    //JoinVideoRoom(mVideoRoomID);
+    JoinVideoRoom(mVideoRoomID);
     JoinTextRoom(mTextRoomID);
 }
 

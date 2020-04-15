@@ -1,25 +1,25 @@
-#ifndef QTCONFERENCEMANAGER_H
-#define QTCONFERENCEMANAGER_H
+#ifndef CONFERENCEMANAGER_H
+#define CONFERENCEMANAGER_H
 
 #include <QObject>
 
 #include "JanusVideoRoomManager.h"
 #include "WebrtcRemoteStream.h"
 
-class QtConferenceManager : public QObject
+class ConferenceManager : public QObject
 {
     Q_OBJECT
 public:
-    QtConferenceManager(QObject *parent = Q_NULLPTR);
-    ~QtConferenceManager();
+    ConferenceManager(QObject *parent = Q_NULLPTR);
+    ~ConferenceManager();
 
-    static QtConferenceManager* GetInstance();
+    static ConferenceManager* GetInstance();
 
     void Login(std::string &server);
 
     void SetVideoWindows(WINDOWID local, QVector<WINDOWID> remote);
 
-    rtc::scoped_refptr<QtWebrtcRemoteStream>    GetLocalWebrtcRemoteStream();
+    rtc::scoped_refptr<WebrtcRemoteStream> GetLocalWebrtcRemoteStream();
 public Q_SLOTS:
     void ConnectToPeer(long long peerId, bool show, bool connect, bool isLocal);
 
@@ -47,7 +47,7 @@ private:
 
     struct RemoteStreamInfo{
     public:
-        rtc::scoped_refptr<QtWebrtcRemoteStream>    stream;
+        rtc::scoped_refptr<WebrtcRemoteStream>    stream;
         std::string sdp;
         std::string sdpType;
         QVector<iceCandidate> iceCandidateList;
@@ -56,16 +56,16 @@ private:
         bool canSendCandidate;
     };
 
-    static QtConferenceManager* instance;
+    static ConferenceManager* instance;
 
-    JanusVideoRoomManager              mJanusVideoRoomManager;
+    JanusVideoRoomManager                 mJanusVideoRoomManager;
     QHash<long long, RemoteStreamInfo>    mRemoteStreamInfos;
     QVector<QPair<WINDOWID, long long>>   mRemoteWinds;
-    WINDOWID                           mLocalWindow;
-    rtc::scoped_refptr<QtWebrtcRemoteStream>    LocalStream;
+    WINDOWID                              mLocalWindow;
+    rtc::scoped_refptr<WebrtcRemoteStream>    LocalStream;
 
 private:
-    void addStreamInfo(rtc::scoped_refptr<QtWebrtcRemoteStream> remoteStream);
+    void addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream);
 
     void sendICEs(long long id, QVector<iceCandidate> &iceCandidateList);
 };

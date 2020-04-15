@@ -33,13 +33,13 @@ public:
     }
 };
 
-QtWebrtcRemoteStream::QtWebrtcRemoteStream(long long peer_id)
+WebrtcRemoteStream::WebrtcRemoteStream(long long peer_id)
     : mPeerID(peer_id)
 {
     rtc::Thread::Current()->ProcessMessages(1);
 }
 
-bool QtWebrtcRemoteStream::CreateDataChannel()
+bool WebrtcRemoteStream::CreateDataChannel()
 {
     struct webrtc::DataChannelInit init;
     init.ordered = true;
@@ -52,7 +52,7 @@ bool QtWebrtcRemoteStream::CreateDataChannel()
     return false;
 }
 
-void QtWebrtcRemoteStream::CloseDataChannel()
+void WebrtcRemoteStream::CloseDataChannel()
 {
     if(data_channel_.get()){
         data_channel_->UnregisterObserver();
@@ -61,7 +61,7 @@ void QtWebrtcRemoteStream::CloseDataChannel()
     data_channel_ = nullptr;
 }
 
-bool QtWebrtcRemoteStream::SendDataViaDataChannel(const std::string &data)
+bool WebrtcRemoteStream::SendDataViaDataChannel(const std::string &data)
 {
     if(!data_channel_.get()){
         return false;
@@ -71,37 +71,37 @@ bool QtWebrtcRemoteStream::SendDataViaDataChannel(const std::string &data)
     return true;
 }
 
-void QtWebrtcRemoteStream::RegisterSendLocalSDP_CallBack(const SENDSDP_CALLBACK &callback)
+void WebrtcRemoteStream::RegisterSendLocalSDP_CallBack(const SENDSDP_CALLBACK &callback)
 {
     OnLocalSDPReady = callback;
 }
 
-void QtWebrtcRemoteStream::RegisterSendIceCandidate_callBack(SENDICECANDIDATE_CALLBACK callback)
+void WebrtcRemoteStream::RegisterSendIceCandidate_callBack(SENDICECANDIDATE_CALLBACK callback)
 {
     OnSendIceCandidate = callback;
 }
 
-void QtWebrtcRemoteStream::RegisterIceGatheringComplete_callBack(ICEGATHERINGCOMPLETE_CALLBACK callback)
+void WebrtcRemoteStream::RegisterIceGatheringComplete_callBack(ICEGATHERINGCOMPLETE_CALLBACK callback)
 {
     OnIceGatheringComplete = callback;
 }
 
-void QtWebrtcRemoteStream::RegisterRecvMessage_callBack(RECVMESSAGE_CALLBACK callback)
+void WebrtcRemoteStream::RegisterRecvMessage_callBack(RECVMESSAGE_CALLBACK callback)
 {
     OnRecvMessage = callback;
 }
 
-void QtWebrtcRemoteStream::RegisterSendLocalInfoWhenOpenDataChannel_callBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback)
+void WebrtcRemoteStream::RegisterSendLocalInfoWhenOpenDataChannel_callBack(SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK callback)
 {
     OnSendLocalInfoWhenOpenDataChannel = callback;
 }
 
-QtWebrtcRemoteStream::~QtWebrtcRemoteStream()
+WebrtcRemoteStream::~WebrtcRemoteStream()
 {
     RTC_DCHECK(!mPeerConnection);
 }
 
-bool QtWebrtcRemoteStream::initializePeerConnection()
+bool WebrtcRemoteStream::initializePeerConnection()
 {
     if(!createPeerConnection(true))
     {
@@ -119,7 +119,7 @@ bool QtWebrtcRemoteStream::initializePeerConnection()
     return mPeerConnection != nullptr;
 }
 
-bool QtWebrtcRemoteStream::createPeerConnection(bool dtls)
+bool WebrtcRemoteStream::createPeerConnection(bool dtls)
 {
     webrtc::PeerConnectionInterface::RTCConfiguration config;
     config.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
@@ -142,13 +142,13 @@ bool QtWebrtcRemoteStream::createPeerConnection(bool dtls)
     return mPeerConnection != nullptr;
 }
 
-void QtWebrtcRemoteStream::DeletePeerConnection()
+void WebrtcRemoteStream::DeletePeerConnection()
 {
     mPeerConnection = nullptr;
     mPeerID = -1;
 }
 
-void QtWebrtcRemoteStream::addTracks()
+void WebrtcRemoteStream::addTracks()
 {
     if(!mPeerConnection->GetSenders().empty())
     {
@@ -182,14 +182,14 @@ void QtWebrtcRemoteStream::addTracks()
 
     mPeerConnection->AddStream(stream);
 #elif 1
-    auto result_or_error = mPeerConnection->AddTrack(AlvaCapturerTrackSource::GetInstall()->GetAudioTrack(),{kStreamId});
+    auto result_or_error = mPeerConnection->AddTrack(CapturerTrackSource::GetInstall()->GetAudioTrack(),{kStreamId});
     if(!result_or_error.ok())
     {
         RTC_LOG(LS_ERROR) << "Failed to add audio track to PeerConnection:"
                           <<result_or_error.error().message();
     }
 
-    result_or_error = mPeerConnection->AddTrack(AlvaCapturerTrackSource::GetInstall()->GetVideoTrack(),{kStreamId});
+    result_or_error = mPeerConnection->AddTrack(CapturerTrackSource::GetInstall()->GetVideoTrack(),{kStreamId});
     if(!result_or_error.ok())
     {
         RTC_LOG(LS_ERROR) << "Failed to add video track to PeerConnection:"
@@ -209,14 +209,14 @@ void QtWebrtcRemoteStream::addTracks()
 #endif
 }
 
-void QtWebrtcRemoteStream::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+void WebrtcRemoteStream::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
                                       const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface> > &streams)
 {
     RTC_LOG(INFO) << " ||| ========== OnAddTrack ========== |||";
     on_peerConnection_addTrack(receiver->track().release());
 }
 
-void QtWebrtcRemoteStream::on_peerConnection_addTrack(webrtc::MediaStreamTrackInterface* track)
+void WebrtcRemoteStream::on_peerConnection_addTrack(webrtc::MediaStreamTrackInterface* track)
 {
     if(track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind)
     {
@@ -228,7 +228,7 @@ void QtWebrtcRemoteStream::on_peerConnection_addTrack(webrtc::MediaStreamTrackIn
     }
 }
 
-void QtWebrtcRemoteStream::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver)
+void WebrtcRemoteStream::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver)
 {
     RTC_LOG(INFO) << " ||| ========== OnRemoveTrack ========== |||";
     if(!isLocal){
@@ -236,13 +236,13 @@ void QtWebrtcRemoteStream::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverI
     }
 }
 
-void QtWebrtcRemoteStream::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
+void WebrtcRemoteStream::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
 {
     RTC_LOG(INFO) << " ||| ========== OnDataChannel ========== |||";
     channel->RegisterObserver(this);
 }
 
-void QtWebrtcRemoteStream::on_peerConnection_removeTrack(webrtc::MediaStreamTrackInterface* track)
+void WebrtcRemoteStream::on_peerConnection_removeTrack(webrtc::MediaStreamTrackInterface* track)
 {
     if(track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind)
     {
@@ -253,7 +253,7 @@ void QtWebrtcRemoteStream::on_peerConnection_removeTrack(webrtc::MediaStreamTrac
     track->Release();
 }
 
-void QtWebrtcRemoteStream::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state)
+void WebrtcRemoteStream::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state)
 {
     RTC_LOG(INFO) << " ||| ========== OnIceGatheringChange ========== |||";
 #if 1
@@ -279,7 +279,7 @@ void QtWebrtcRemoteStream::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 #endif
 }
 
-void QtWebrtcRemoteStream::OnIceCandidate(const webrtc::IceCandidateInterface *candidate)
+void WebrtcRemoteStream::OnIceCandidate(const webrtc::IceCandidateInterface *candidate)
 {
     RTC_LOG(INFO) << " ||| ========== OnIceCandidate ========== |||";
     std::string sdp;
@@ -291,7 +291,7 @@ void QtWebrtcRemoteStream::OnIceCandidate(const webrtc::IceCandidateInterface *c
     Q_EMIT LocalIceCandidate(mPeerID,STDSTR_TO_QTSTR(candidate->sdp_mid()),candidate->sdp_mline_index(),STDSTR_TO_QTSTR(sdp));
 }
 
-bool QtWebrtcRemoteStream::AddPeerIceCandidate(QString sdp_mid_, int sdp_mlineindex_, QString candidate_)
+bool WebrtcRemoteStream::AddPeerIceCandidate(QString sdp_mid_, int sdp_mlineindex_, QString candidate_)
 {
     RTC_DCHECK(!sdp_mid_.isEmpty());
     RTC_DCHECK(!candidate_.isEmpty());
@@ -323,7 +323,7 @@ bool QtWebrtcRemoteStream::AddPeerIceCandidate(QString sdp_mid_, int sdp_mlinein
     return true;
 }
 
-bool QtWebrtcRemoteStream::SetPeerSDP(std::string type, std::string sdp)
+bool WebrtcRemoteStream::SetPeerSDP(std::string type, std::string sdp)
 {
     RTC_DCHECK(!sdp.empty());
     if(!mPeerConnection.get())
@@ -358,7 +358,7 @@ bool QtWebrtcRemoteStream::SetPeerSDP(std::string type, std::string sdp)
     return true;
 }
 
-void QtWebrtcRemoteStream::ConnectToPeer()
+void WebrtcRemoteStream::ConnectToPeer()
 {
    RTC_DCHECK(mPeerID != -1);
 
@@ -380,7 +380,7 @@ void QtWebrtcRemoteStream::ConnectToPeer()
    }
 }
 
-void QtWebrtcRemoteStream::OnSuccess(webrtc::SessionDescriptionInterface *desc)
+void WebrtcRemoteStream::OnSuccess(webrtc::SessionDescriptionInterface *desc)
 {
     qDebug() << " ||| ========== OnSuccess ========== |||";
     mPeerConnection->SetLocalDescription(
@@ -392,13 +392,13 @@ void QtWebrtcRemoteStream::OnSuccess(webrtc::SessionDescriptionInterface *desc)
     Q_EMIT LocalSDP(mPeerID, STDSTR_TO_QTSTR(sdp),STDSTR_TO_QTSTR(desc->type()));
 }
 
-void QtWebrtcRemoteStream::OnFailure(webrtc::RTCError error)
+void WebrtcRemoteStream::OnFailure(webrtc::RTCError error)
 {
    qDebug() << " ||| ========== OnFailure ========== |||";
    RTC_LOG(LERROR)<<ToString(error.type())<<":"<<error.message();
 }
 
-void QtWebrtcRemoteStream::OnStateChange()
+void WebrtcRemoteStream::OnStateChange()
 {
     qDebug() << " ||| ========== OnStateChange ========== |||";
     if (data_channel_) {
@@ -419,7 +419,7 @@ void QtWebrtcRemoteStream::OnStateChange()
     }
 }
 
-void QtWebrtcRemoteStream::OnMessage(const webrtc::DataBuffer &buffer)
+void WebrtcRemoteStream::OnMessage(const webrtc::DataBuffer &buffer)
 {
     RTC_LOG(INFO) << " ||| ========== OnMessage ========== |||";
     size_t size = buffer.data.size();

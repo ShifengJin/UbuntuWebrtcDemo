@@ -42,8 +42,8 @@ void MainWindow::onOnJoinButtonClicked()
     QString serverUrl = ui->Url_LE->text();
     qDebug() << "onOnJoinButtonClicked ...." << serverUrl;
 
-    AlvaCapturerTrackSource::GetInstall()->getCapturerTrackSource()->GetCapturer()->SetWindowID(this->localWindowID);
-    AlvaCapturerTrackSource::GetInstall()->CreateVideoTrackAndAudioTrack();
+    CapturerTrackSource::GetInstall()->getCapturerTrackSource()->GetCapturer()->SetWindowID(this->localWindowID);
+    CapturerTrackSource::GetInstall()->CreateVideoTrackAndAudioTrack();
 
     WebRTCInterface::GetInstance()->Login(serverUrl);
 }

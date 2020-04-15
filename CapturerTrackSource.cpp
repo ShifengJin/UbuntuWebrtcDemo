@@ -4,14 +4,14 @@
 const char kAudioLabel[] = "audio_label";
 const char kVideoLabel[] = "video_label";
 
-AlvaCapturerTrackSource* AlvaCapturerTrackSource::install = NULL;
+CapturerTrackSource* CapturerTrackSource::install = NULL;
 
-AlvaCapturerTrackSource::AlvaCapturerTrackSource()
+CapturerTrackSource::CapturerTrackSource()
 {
-    mCapturerTrackSource = new rtc::RefCountedObject<CapturerTrackSource>();
+    mCapturerTrackSource = new rtc::RefCountedObject<CapturerTrackSourceBase>();
 }
 
-void AlvaCapturerTrackSource::CreateVideoTrackAndAudioTrack()
+void CapturerTrackSource::CreateVideoTrackAndAudioTrack()
 {
     mAudioTrack = ConnecttionFactory::Get()->CreateAudioTrack(kAudioLabel, ConnecttionFactory::Get()->CreateAudioSource(cricket::AudioOptions()));
 
@@ -20,26 +20,26 @@ void AlvaCapturerTrackSource::CreateVideoTrackAndAudioTrack()
     }
 }
 
-rtc::scoped_refptr<webrtc::VideoTrackInterface> AlvaCapturerTrackSource::GetVideoTrack()
+rtc::scoped_refptr<webrtc::VideoTrackInterface> CapturerTrackSource::GetVideoTrack()
 {
     return mVideoTrack;
 }
 
-rtc::scoped_refptr<webrtc::AudioTrackInterface> AlvaCapturerTrackSource::GetAudioTrack()
+rtc::scoped_refptr<webrtc::AudioTrackInterface> CapturerTrackSource::GetAudioTrack()
 {
     return mAudioTrack;
 }
 
-AlvaCapturerTrackSource *AlvaCapturerTrackSource::GetInstall()
+CapturerTrackSource *CapturerTrackSource::GetInstall()
 {
     if(install == NULL){
-        install = new AlvaCapturerTrackSource();
+        install = new CapturerTrackSource();
         return install;
     }
     return install;
 }
 
-CapturerTrackSource::CapturerTrackSource() : VideoTrackSource(false)
+CapturerTrackSourceBase::CapturerTrackSourceBase() : VideoTrackSource(false)
 {
     const size_t kWidth = 640;
     const size_t kHeight = 480;

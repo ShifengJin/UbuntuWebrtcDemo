@@ -1,19 +1,19 @@
-#ifndef QTWEBRTCVIDEOFRAME_H
-#define QTWEBRTCVIDEOFRAME_H
+#ifndef WEBRTCVIDEOFRAME_H
+#define WEBRTCVIDEOFRAME_H
 
 #include <memory>
 #include <webrtc/api/media_stream_interface.h>
 #include "Common.h"
 
-class QtWebRTCVideoFrame : public rtc::VideoSinkInterface<webrtc::VideoFrame>
+class WebrtcVideoFrame : public rtc::VideoSinkInterface<webrtc::VideoFrame>
 {
 public:
     /* 創建QtWebRTCVideoFrame類
      * @param iWindowID    : 指定顯示窗口的 ID
     */
-    QtWebRTCVideoFrame(WINDOWID iWindowID);
+    WebrtcVideoFrame(WINDOWID iWindowID);
 
-    virtual ~QtWebRTCVideoFrame();
+    virtual ~WebrtcVideoFrame();
 
     /*
      * 獲取圖像後會觸發該回調函數, 可在該函數中實現圖像的渲染
@@ -36,4 +36,4 @@ private:
     WINDOWID mWindowID;
 };
 
-#endif // QTWEBRTCVIDEOFRAME_H
+#endif // WEBRTCVIDEOFRAME_H

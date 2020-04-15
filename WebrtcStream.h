@@ -1,5 +1,5 @@
-#ifndef QTWEBRTCSTREAM_H
-#define QTWEBRTCSTREAM_H
+#ifndef WEBRTCSTREAM_H
+#define WEBRTCSTREAM_H
 
 #include <webrtc/api/media_stream_interface.h>
 #include "WebrtcVideoFrame.h"
@@ -14,11 +14,11 @@
  *               @20191024: base
  * note : used to webrtc video and audio
  */
-class QtWebrtcStream
+class WebrtcStream
 {
 public:
-    QtWebrtcStream();
-    ~QtWebrtcStream();
+    WebrtcStream();
+    ~WebrtcStream();
 
     rtc::scoped_refptr<webrtc::VideoTrackInterface> GetVideoTrack();
 
@@ -39,7 +39,7 @@ public:
     void SetVideoTrack(rtc::scoped_refptr<webrtc::VideoTrackInterface> iVideoTrack);
 
     /*
-     * 開始渲染,即創建mRender,然後QtWebRTCVideoFrame類會觸發回調函數OnFrame達到顯示效果
+     * 開始渲染,即創建mRender,然後WebrtcVideoFrame類會觸發回調函數OnFrame達到顯示效果
      */
     void StartView();
 
@@ -52,8 +52,8 @@ protected:
     rtc::scoped_refptr<webrtc::VideoTrackInterface> mVideoTrack;
     rtc::scoped_refptr<webrtc::AudioTrackInterface> mAudioTrack;
 
-    QtWebRTCVideoFrame                             *mRender;
+    WebrtcVideoFrame                               *mRender;
     WINDOWID                                        mWindowID;
 };
 
-#endif // QTWEBRTCSTREAM_H
+#endif // WebrtcStream_H

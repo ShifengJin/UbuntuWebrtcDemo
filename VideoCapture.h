@@ -11,11 +11,11 @@
 
 #include "Common.h"
 
-class TestVideoCapture : public rtc::VideoSourceInterface<webrtc::VideoFrame>
+class VideoCapture : public rtc::VideoSourceInterface<webrtc::VideoFrame>
 {
 public:
-    TestVideoCapture();
-    ~TestVideoCapture() override;
+    VideoCapture();
+    ~VideoCapture() override;
 
     void AddOrUpdateSink(rtc::VideoSinkInterface<webrtc::VideoFrame> * sink,
                          const rtc::VideoSinkWants& wants) override;

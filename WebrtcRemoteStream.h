@@ -1,5 +1,5 @@
-#ifndef QTWEBRTCREMOTESTREAM_H
-#define QTWEBRTCREMOTESTREAM_H
+#ifndef WEBRTCREMOTESTREAM_H
+#define WEBRTCREMOTESTREAM_H
 
 
 
@@ -20,12 +20,12 @@ typedef std::function<void(long long)> ICEGATHERINGCOMPLETE_CALLBACK;
 typedef std::function<void(std::string)> RECVMESSAGE_CALLBACK;
 typedef std::function<void(std::string&)> SENDLOCALINFOWHENOPENDATACHANNEL_CALLBACK;
 
-class QtWebrtcRemoteStream : public QObject, public QtWebrtcStream,
+class WebrtcRemoteStream : public QObject, public WebrtcStream,
     public webrtc::PeerConnectionObserver, public webrtc::CreateSessionDescriptionObserver, public webrtc::DataChannelObserver
 {
     Q_OBJECT
 public:
-    QtWebrtcRemoteStream(long long peer_id);
+    WebrtcRemoteStream(long long peer_id);
 
     long long id() const { return mPeerID; }
     void setid(long long id) { mPeerID = id; }
@@ -57,7 +57,7 @@ Q_SIGNALS:
     void IceGatheringComplete(long long id);
 
 protected:
-    ~QtWebrtcRemoteStream();
+    ~WebrtcRemoteStream();
     bool initializePeerConnection();
     bool createPeerConnection(bool dtls);
     void addTracks();
@@ -100,4 +100,4 @@ protected:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> mPeerConnection;
     rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel_;
 };
-#endif // QTWEBRTCREMOTESTREAM_H
+#endif // WebrtcRemoteStream_H

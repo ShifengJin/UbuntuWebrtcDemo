@@ -9,28 +9,28 @@
 #include <libyuv/convert_argb.h>
 #include "VideoRender.h"
 
-TestVideoCapture::TestVideoCapture(){
+VideoCapture::VideoCapture(){
 
 }
 
-TestVideoCapture::~TestVideoCapture(){
+VideoCapture::~VideoCapture(){
 
 }
 
-void TestVideoCapture::AddOrUpdateSink(rtc::VideoSinkInterface<webrtc::VideoFrame> *sink, const rtc::VideoSinkWants &wants)
+void VideoCapture::AddOrUpdateSink(rtc::VideoSinkInterface<webrtc::VideoFrame> *sink, const rtc::VideoSinkWants &wants)
 {
     qDebug() << "AddOrUpdateSink .................";
     broadcaster_.AddOrUpdateSink(sink, wants);
     UpdateVideoAdapter();
 }
 
-void TestVideoCapture::RemoveSink(rtc::VideoSinkInterface<webrtc::VideoFrame> *sink)
+void VideoCapture::RemoveSink(rtc::VideoSinkInterface<webrtc::VideoFrame> *sink)
 {
     broadcaster_.RemoveSink(sink);
     UpdateVideoAdapter();
 }
 
-void TestVideoCapture::OnFrame(const webrtc::VideoFrame &frame)
+void VideoCapture::OnFrame(const webrtc::VideoFrame &frame)
 {
     int cropped_width = 0;
     int cropped_height = 0;
@@ -61,12 +61,12 @@ void TestVideoCapture::OnFrame(const webrtc::VideoFrame &frame)
     }
 }
 
-rtc::VideoSinkWants TestVideoCapture::GetSinkWants()
+rtc::VideoSinkWants VideoCapture::GetSinkWants()
 {
     return broadcaster_.wants();
 }
 
-void TestVideoCapture::UpdateVideoAdapter()
+void VideoCapture::UpdateVideoAdapter()
 {
     rtc::VideoSinkWants wants = broadcaster_.wants();
     video_adapter_.OnResolutionFramerateRequest(wants.target_pixel_count, wants.max_pixel_count,
