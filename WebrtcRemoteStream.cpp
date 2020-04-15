@@ -111,7 +111,7 @@ bool QtWebrtcRemoteStream::initializePeerConnection()
 
     if(isLocal){
         if(CreateDataChannel()){
-            RTC_LOG(INFO) << "CreateDataChannel successed.";
+            qDebug() << "CreateDataChannel successed.";
         }
     }else{
         addTracks();
@@ -382,46 +382,29 @@ void QtWebrtcRemoteStream::ConnectToPeer()
 
 void QtWebrtcRemoteStream::OnSuccess(webrtc::SessionDescriptionInterface *desc)
 {
-    RTC_LOG(INFO) << " ||| ========== OnSuccess ========== |||";
+    qDebug() << " ||| ========== OnSuccess ========== |||";
     mPeerConnection->SetLocalDescription(
                 DummySetSessionDescriptionObserver::Create(),desc);
 
-    RTC_LOG(INFO) << "  type : " << desc->type();
     std::string sdp;
     desc->ToString(&sdp);
-
-    RTC_LOG(INFO) << "  sdp : " << sdp;
-    RTC_LOG(INFO) << " ||| ========== OnSuccess ========== 11111111111  |||";
-
-    if(OnLocalSDPReady){
-        //OnLocalSDPReady(mPeerID, sdp, desc->type());
-        //OnLocalSDPReady(mPeerID, STDSTR_TO_QTSTR(sdp),STDSTR_TO_QTSTR(desc->type()));
-    }
-
-
-
-    std::thread::id threadid = std::this_thread::get_id();
-    std::stringstream sin;
-    sin << threadid;
-
-    RTC_LOG(INFO) << "================================> OnSuccess   thread id : " << sin.str();
 
     Q_EMIT LocalSDP(mPeerID, STDSTR_TO_QTSTR(sdp),STDSTR_TO_QTSTR(desc->type()));
 }
 
 void QtWebrtcRemoteStream::OnFailure(webrtc::RTCError error)
 {
-   RTC_LOG(INFO) << " ||| ========== OnFailure ========== |||";
+   qDebug() << " ||| ========== OnFailure ========== |||";
    RTC_LOG(LERROR)<<ToString(error.type())<<":"<<error.message();
 }
 
 void QtWebrtcRemoteStream::OnStateChange()
 {
-    RTC_LOG(INFO) << " ||| ========== OnStateChange ========== |||";
+    qDebug() << " ||| ========== OnStateChange ========== |||";
     if (data_channel_) {
       webrtc::DataChannelInterface::DataState state = data_channel_->state();
       if (state == webrtc::DataChannelInterface::kOpen) {
-        RTC_LOG(LS_INFO) << "Data channel is open";
+        qDebug() << "Data channel is open";
 
         if(OnSendLocalInfoWhenOpenDataChannel){
             std::string sendMessage;

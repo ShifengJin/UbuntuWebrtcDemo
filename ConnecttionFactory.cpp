@@ -59,8 +59,8 @@ bool ConnecttionFactory::Init()
     g_networker_thread.reset(new rtc::Thread());
     g_networker_thread->Start();
     _peer_connection_factory = webrtc::CreatePeerConnectionFactory(
-                    //g_networker_thread.get(), g_worker_thread.get(), g_signaling_thread.get(),nullptr,
-                    nullptr, nullptr, g_signaling_thread.get(),nullptr,
+                    g_networker_thread.get(), g_worker_thread.get(), g_signaling_thread.get(),nullptr,
+                    //nullptr, nullptr, g_signaling_thread.get(),nullptr,
                     webrtc::CreateBuiltinAudioEncoderFactory(),
                     webrtc::CreateBuiltinAudioDecoderFactory(),
                     webrtc::CreateBuiltinVideoEncoderFactory(),

@@ -114,6 +114,7 @@ void JanusPeerConnection::onAttachVideoRoomCreate(const Json::Value &recvMsg)
 void JanusPeerConnection::onAttachTextRoomJoin(const Json::Value &recvMsg)
 {
     mTextRoomHandleID = JsonValueToLongLong(recvMsg, "id");
+
     joinTextRoom();
 }
 
@@ -256,7 +257,7 @@ void JanusPeerConnection::SendSDPText(std::string sdp, std::string type)
     Json::Value body;
     body["request"] = "ack";
 
-    msg["handle_id"] = (double)mVideoRoomHandleID;
+    msg["handle_id"] = (double)mTextRoomHandleID;
     QString transaction = GetRandomString(12);
     msg["transaction"] = transaction.toStdString();
 

@@ -68,6 +68,8 @@ private:
 
     void onVideoRoomEventUnpublish(const Json::Value &recvData);
     void onVideoRoomEventEvent(const Json::Value &recvData);
+
+    void onTextRoomEventEvent(const Json::Value &recvData);
 private:
     JanusWebSocket          *pWebSocket;
 

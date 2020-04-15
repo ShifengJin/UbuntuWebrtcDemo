@@ -114,12 +114,6 @@ void QtConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConn
 
 void QtConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
 {
-    std::thread::id threadid = std::this_thread::get_id();
-    std::stringstream sin;
-    sin << threadid;
-
-    //qDebug() << "================================> onLocalSDP   thread id : " << QString::fromStdString(sin.str());
-    //qDebug() << "================================> sdp : " << QString::fromStdString(sdp);
     auto itr = mRemoteStreamInfos.find(id);
 
     auto  &remoteStreamState  = *itr;

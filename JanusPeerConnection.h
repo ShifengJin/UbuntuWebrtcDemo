@@ -54,8 +54,8 @@ private:
 
     int mVideoRoomId;
     int mTextRoomId;
-    std::string mVideoRoomDisplayName;
-    std::string mTextRoomDisplayName;
+    std::string mVideoRoomDisplayName = "cc";
+    std::string mTextRoomDisplayName = "cc";
 
     bool isVideoRoomCreate = false;
     bool isTextRoomCreate = false;
