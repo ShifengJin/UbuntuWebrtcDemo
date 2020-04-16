@@ -63,8 +63,9 @@ SOURCES += \
     VideoCapture.cpp \
     VideoRender.cpp \
     WebrtcInterface.cpp \
-    WebrtcRemoteStream.cpp \
-    WebrtcStream.cpp \
+    WebrtcStreamBase.cpp \
+    WebrtcStreamDataChannels.cpp \
+    WebrtcStreamVideoAudio.cpp \
     WebrtcVideoFrame.cpp \
         main.cpp \
         MainWindow.cpp \
@@ -89,8 +90,9 @@ HEADERS += \
     CapturerTrackSource.h \
     VcmCapture.h \
     WebrtcInterface.h \
-    WebrtcRemoteStream.h \
-    WebrtcStream.h \
+    WebrtcStreamBase.h \
+    WebrtcStreamDataChannels.h \
+    WebrtcStreamVideoAudio.h \
     WebrtcVideoFrame.h
 
 

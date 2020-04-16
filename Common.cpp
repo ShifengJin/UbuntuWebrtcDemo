@@ -66,3 +66,14 @@ std::string GetPeerName()
 
 
 
+static std::string gServerUrl;
+void SetServerUrl(std::string url)
+{
+    gServerUrl = url;
+}
+
+
+std::string GetServerUrl()
+{
+    return gServerUrl;
+}

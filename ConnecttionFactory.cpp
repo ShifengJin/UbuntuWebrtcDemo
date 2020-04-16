@@ -12,43 +12,6 @@ rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> ConnecttionFactory::_
 
 bool ConnecttionFactory::Init()
 {
-#if 0
-    _peer_connection_factory = webrtc::CreatePeerConnectionFactory(
-                NULL,NULL,rtc::Thread::Current(),nullptr,
-                webrtc::CreateBuiltinAudioEncoderFactory(),
-                webrtc::CreateBuiltinAudioDecoderFactory(),
-                webrtc::CreateBuiltinVideoEncoderFactory(),
-                webrtc::CreateBuiltinVideoDecoderFactory(),
-                nullptr,nullptr);
-#elif 0
-    static std::unique_ptr<rtc::Thread> g_worker_thread;
-    static std::unique_ptr<rtc::Thread> g_signaling_thread;
-    g_worker_thread.reset(new rtc::Thread());
-    g_worker_thread->Start();
-    g_signaling_thread.reset(new rtc::Thread());
-    g_signaling_thread->Start();
-    _peer_connection_factory = webrtc::CreatePeerConnectionFactory(
-                    g_worker_thread.get(), g_worker_thread.get(), g_signaling_thread.get(),nullptr,
-                    webrtc::CreateBuiltinAudioEncoderFactory(),
-                    webrtc::CreateBuiltinAudioDecoderFactory(),
-                    webrtc::CreateBuiltinVideoEncoderFactory(),
-                    webrtc::CreateBuiltinVideoDecoderFactory(),
-                    nullptr,nullptr);
-#elif 0
-    static std::unique_ptr<rtc::Thread> g_worker_thread;
-    static std::unique_ptr<rtc::Thread> g_signaling_thread;
-    g_worker_thread.reset(new rtc::Thread());
-    g_worker_thread->Start();
-    g_signaling_thread.reset(new rtc::Thread());
-    g_signaling_thread->Start();
-    _peer_connection_factory = webrtc::CreatePeerConnectionFactory(
-                    NULL,NULL, g_signaling_thread.get(),nullptr,
-                    webrtc::CreateBuiltinAudioEncoderFactory(),
-                    webrtc::CreateBuiltinAudioDecoderFactory(),
-                    webrtc::CreateBuiltinVideoEncoderFactory(),
-                    webrtc::CreateBuiltinVideoDecoderFactory(),
-                    nullptr,nullptr);
-#else
     static std::unique_ptr<rtc::Thread> g_worker_thread;
     static std::unique_ptr<rtc::Thread> g_networker_thread;
     static std::unique_ptr<rtc::Thread> g_signaling_thread;
@@ -66,7 +29,6 @@ bool ConnecttionFactory::Init()
                     webrtc::CreateBuiltinVideoEncoderFactory(),
                     webrtc::CreateBuiltinVideoDecoderFactory(),
                     nullptr,nullptr);
-#endif
 
     return _peer_connection_factory == nullptr;
 }

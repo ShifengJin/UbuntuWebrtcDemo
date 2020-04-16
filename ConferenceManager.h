@@ -4,7 +4,8 @@
 #include <QObject>
 
 #include "JanusVideoRoomManager.h"
-#include "WebrtcRemoteStream.h"
+#include "WebrtcStreamVideoAudio.h"
+#include "WebrtcStreamDataChannels.h"
 
 class ConferenceManager : public QObject
 {
@@ -19,7 +20,8 @@ public:
 
     void SetVideoWindows(WINDOWID local, QVector<WINDOWID> remote);
 
-    rtc::scoped_refptr<WebrtcRemoteStream> GetLocalWebrtcRemoteStream();
+    rtc::scoped_refptr<WebrtcStreamVideoAudio> GetLocalWebrtcRemoteStream();
+    // rtc::scoped_refptr<WebrtcStreamDataChannels> GetLocalWebrtcRemoteStream();
 public Q_SLOTS:
     void ConnectToPeer(long long peerId, bool show, bool connect, bool isLocal);
 
@@ -47,7 +49,9 @@ private:
 
     struct RemoteStreamInfo{
     public:
-        rtc::scoped_refptr<WebrtcRemoteStream>    stream;
+        //rtc::scoped_refptr<WebrtcRemoteStream>    stream;
+        rtc::scoped_refptr<WebrtcStreamVideoAudio>    stream;
+        // rtc::scoped_refptr<WebrtcStreamDataChannels>    stream;
         std::string sdp;
         std::string sdpType;
         QVector<iceCandidate> iceCandidateList;
@@ -62,10 +66,13 @@ private:
     QHash<long long, RemoteStreamInfo>    mRemoteStreamInfos;
     QVector<QPair<WINDOWID, long long>>   mRemoteWinds;
     WINDOWID                              mLocalWindow;
-    rtc::scoped_refptr<WebrtcRemoteStream>    LocalStream;
+    rtc::scoped_refptr<WebrtcStreamVideoAudio>    LocalStream;
+    //rtc::scoped_refptr<WebrtcStreamDataChannels>    LocalStream;
 
 private:
-    void addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream);
+    // void addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream);
+    void addStreamInfo(rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream);
+    // void addStreamInfo(rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream);
 
     void sendICEs(long long id, QVector<iceCandidate> &iceCandidateList);
 };

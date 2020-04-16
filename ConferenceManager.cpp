@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "WebrtcStreamVideoAudio.h"
 #include "Common.h"
 
 ConferenceManager* ConferenceManager::instance = NULL;
@@ -46,12 +47,15 @@ void ConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned lo
     }
 }
 
-rtc::scoped_refptr<WebrtcRemoteStream> ConferenceManager::GetLocalWebrtcRemoteStream()
+rtc::scoped_refptr<WebrtcStreamVideoAudio> ConferenceManager::GetLocalWebrtcRemoteStream()
+//rtc::scoped_refptr<WebrtcStreamDataChannels> ConferenceManager::GetLocalWebrtcRemoteStream()
 {
     return LocalStream;
 }
 
-void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream)
+// void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream)
+#if 1
+void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream)
 {
     RemoteStreamInfo stream;
     stream.stream = remoteStream;
@@ -59,10 +63,26 @@ void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> rem
     stream.canSendSDP = true;
     stream.canSendCandidate = true;
 
-    long long peerId = remoteStream->id();
+    // long long peerId = remoteStream->id();
+    long long peerId = remoteStream->GetHandleID();
 
     mRemoteStreamInfos[peerId] = stream;
 }
+#else
+void ConferenceManager::addStreamInfo(rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream)
+{
+    RemoteStreamInfo stream;
+    stream.stream = remoteStream;
+
+    stream.canSendSDP = true;
+    stream.canSendCandidate = true;
+
+    // long long peerId = remoteStream->id();
+    long long peerId = remoteStream->GetHandleID();
+
+    mRemoteStreamInfos[peerId] = stream;
+}
+#endif
 
 void ConferenceManager::sendICEs(long long id, QVector<ConferenceManager::iceCandidate> &iceCandidateList)
 {
@@ -74,9 +94,10 @@ void ConferenceManager::sendICEs(long long id, QVector<ConferenceManager::iceCan
     }
 }
 
+#if 1
 void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnect, bool isLocal)
 {
-    rtc::scoped_refptr<WebrtcRemoteStream> remoteStream = new rtc::RefCountedObject<WebrtcRemoteStream>(peerId);
+    rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream = new rtc::RefCountedObject<WebrtcStreamVideoAudio>(peerId);
     remoteStream->SetIsLocal(isLocal);
 
     if(isLocal){
@@ -86,9 +107,6 @@ void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnec
     connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
     connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
     connect(remoteStream, SIGNAL(IceGatheringComplete(long long)), this, SLOT(onIceGatheringComplete(long long)));
-
-    remoteStream->RegisterSendLocalInfoWhenOpenDataChannelCallBack(std::bind(&ConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
-
     addStreamInfo(remoteStream);
 
     if(show){
@@ -105,7 +123,24 @@ void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnec
         remoteStream->ConnectToPeer();
     }
 }
+#else
+void ConferenceManager::ConnectToPeer(long long peerId, bool show, bool isConnect, bool isLocal)
+{
+    // rtc::scoped_refptr<WebrtcRemoteStream> remoteStream = new rtc::RefCountedObject<WebrtcRemoteStream>(peerId);
+    rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream = new rtc::RefCountedObject<WebrtcStreamDataChannels>(peerId);
 
+    if(isLocal){
+        LocalStream = remoteStream;
+    }
+
+    connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
+    connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
+    connect(remoteStream, SIGNAL(IceGatheringComplete(long long)), this, SLOT(onIceGatheringComplete(long long)));
+    remoteStream->RegisterSendLocalInfoWhenOpenDataChannelCallBack(std::bind(&ConferenceManager::onSendLocalInfoWhenOpenDataChannel, this, std::placeholders::_1));
+    addStreamInfo(remoteStream);
+}
+
+#endif
 void ConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
 {
     auto itr = mRemoteStreamInfos.find(id);
@@ -137,7 +172,7 @@ void ConferenceManager::onRetmoeIce(long long id, QString sdp_mid, int sdp_mline
 
     auto &remoteStreamState = *itr;
     auto &remoteStream = remoteStreamState.stream;
-    remoteStream->AddPeerIceCandidate(sdp_mid, sdp_mlineindex, candidate);
+    // remoteStream->AddPeerIceCandidate(sdp_mid, sdp_mlineindex, candidate);
 }
 
 void ConferenceManager::onLocalIceCandidate(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate)
@@ -155,7 +190,8 @@ void ConferenceManager::onLocalIceCandidate(long long id, QString sdp_mid, int s
 
     if(remoteStreamState.canSendCandidate)
     {
-        sendICEs(remoteStream->id(), iceCandidateList);
+        // sendICEs(remoteStream->id(), iceCandidateList);
+        sendICEs(remoteStream->GetHandleID(), iceCandidateList);
     }
 }
 
@@ -188,7 +224,8 @@ void ConferenceManager::onRemoteStreamRemove(long long streamId)
     auto itr = mRemoteStreamInfos.find(streamId);
     if(itr != mRemoteStreamInfos.end())
     {
-        mJanusVideoRoomManager.DisconnectPeer(itr->stream->id());
+        // mJanusVideoRoomManager.DisconnectPeer(itr->stream->id());
+        mJanusVideoRoomManager.DisconnectPeer(itr->stream->GetHandleID());
         itr->stream->DeletePeerConnection();
         mRemoteStreamInfos.erase(itr);
     }

@@ -152,7 +152,7 @@ void JanusVideoRoomManager::onCreateSessionId(const Json::Value &recvmsg)
     //CreateTextRoom(mTextRoomID);
 
     JoinVideoRoom(mVideoRoomID);
-    JoinTextRoom(mTextRoomID);
+    // JoinTextRoom(mTextRoomID);
 }
 
 void JanusVideoRoomManager::onHeartBeat(const Json::Value &recvmsg)

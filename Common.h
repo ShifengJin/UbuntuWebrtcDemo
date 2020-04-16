@@ -1,6 +1,7 @@
 #ifndef COMMONFUNCTION_H
 #define COMMONFUNCTION_H
 
+#include <QDebug>
 #include <QObject>
 #include <QString>
 #include <QJsonDocument>
@@ -30,10 +31,15 @@
 #define WINDOWID unsigned long
 #endif
 
+#ifndef LOGINFO
+#define LOGINFO(msg) qDebug() << __FILE__ << "  " << __FUNCTION__ << "  " << __LINE__ << "  : " << msg;
+#endif
 
 QString GetRandomString(int len);
 
 std::string GetPeerConnectionString();
 
+void SetServerUrl(std::string url);
+std::string GetServerUrl();
 
 #endif // COMMONFUNCTION_H

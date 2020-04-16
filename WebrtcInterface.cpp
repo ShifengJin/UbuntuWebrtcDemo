@@ -35,5 +35,5 @@ void WebRTCInterface::SetVideoWindows(unsigned long localWindow, QVector<unsigne
 
 void WebRTCInterface::SendMessage(std::string message)
 {
-    ConferenceManager::GetInstance()->GetLocalWebrtcRemoteStream()->SendDataViaDataChannel(message);
+    //ConferenceManager::GetInstance()->GetLocalWebrtcRemoteStream()->SendDataViaDataChannel(message);
 }
