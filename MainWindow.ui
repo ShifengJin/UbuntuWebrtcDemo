@@ -20,7 +20,7 @@
       <x>29</x>
       <y>19</y>
       <width>221</width>
-      <height>521</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="title">
@@ -31,8 +31,8 @@
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>188</width>
-       <height>122</height>
+       <width>198</width>
+       <height>196</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -40,18 +40,50 @@
        <widget class="QLineEdit" name="Url_LE"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QPushButton" name="OnJoin_PB">
+         <widget class="QPushButton" name="Login_PB">
           <property name="text">
-           <string>OnJoin</string>
+           <string>Login</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="UnJoin_PB">
+         <widget class="QPushButton" name="Logout_PB">
           <property name="text">
-           <string comment="UnJoin" extracomment="UnJoin">UnJoin</string>
+           <string>Logout</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="VideoRoomID_LB">
+          <property name="text">
+           <string>VideoRoomID</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="VideoRoomID_LE"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="JoinVRoom_PB">
+          <property name="text">
+           <string>JoinVRoom</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="LeaveVRoom_PB">
+          <property name="text">
+           <string comment="UnJoin" extracomment="UnJoin">LeaveVRoom</string>
           </property>
           <property name="autoDefault">
            <bool>false</bool>
@@ -61,14 +93,65 @@
        </layout>
       </item>
       <item>
-       <widget class="QLineEdit" name="Message_LE"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="DataRoomID_LB">
+          <property name="text">
+           <string>DataRoomID</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="DataRoomID_LE"/>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="SendMessage_PB">
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="JoinDRoom_PB">
+          <property name="text">
+           <string>JoinDRoom</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="LeaveDRoom_PB">
+          <property name="text">
+           <string>LeaveDRoom</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>249</y>
+       <width>201</width>
+       <height>201</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTextEdit" name="Message_TE"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="SendMessage_LE"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Send_PB">
+          <property name="text">
+           <string>Send</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

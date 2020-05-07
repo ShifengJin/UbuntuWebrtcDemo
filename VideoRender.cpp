@@ -236,6 +236,16 @@ void VideoRender::paintGL()
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+#if 0
+    GLint format;
+    GLint type;
+
+    glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &type);
+    glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &format);
+    // glReadPixels(0, 0, mVideoW, mVideoH, format, type, );
+    qDebug() << "type : " << type;
+    qDebug() << "format : " << format;
+#endif
     mMutex.unlock();
 
 }

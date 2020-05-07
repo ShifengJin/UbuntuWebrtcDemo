@@ -24,7 +24,7 @@ public:
     void CreateVideoRoom(int roomId);
     void CreateTextRoom(int roomId);
 
-    void JoinVideoRoom(int roomId);
+    void JoinVideoRoom(int roomId, std::string videoRoomDisplayName);
     void JoinTextRoom(int roomId);
 
     void RegisterConnectToPeerCallBack(CONNECTTOPEER_CALLBACK callback);
@@ -74,7 +74,7 @@ private:
     JanusWebSocket          *pWebSocket;
 
     int                 mVideoRoomID = 1234;
-    int                 mTextRoomID = 1234;
+    // int                 mTextRoomID = 1234;
 
     long long int       mSessionId = 0;
     long long int       mPrivatedId = 0;

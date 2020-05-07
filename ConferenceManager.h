@@ -20,17 +20,20 @@ public:
 
     void SetVideoWindows(WINDOWID local, QVector<WINDOWID> remote);
 
-    rtc::scoped_refptr<WebrtcStreamVideoAudio> GetLocalWebrtcRemoteStream();
-    // rtc::scoped_refptr<WebrtcStreamDataChannels> GetLocalWebrtcRemoteStream();
-public Q_SLOTS:
-    void ConnectToPeer(long long peerId, bool show, bool connect, bool isLocal);
+    rtc::scoped_refptr<WebrtcStreamVideoAudio> GetLocalWebrtcStream_VideoAudio();
+    rtc::scoped_refptr<WebrtcStreamDataChannels> GetLocalWebrtcStream_DataChannels();
 
-    //void onLocalSDP(long long id, std::string sdp, std::string type);
+    void SetTextRoomIDAndDisplayName(int inTextRoomID, std::string inDisplayName);
+    int GetTextRoomID() { return mTextRoomID; }
+    std::string GetTextRoomDisplayName() { return mTextRoomDisplayName; }
+
+public Q_SLOTS:
+    void ConnectToPeer_VideoAudio(long long peerId, bool show, bool connect, bool isLocal);
+    void ConnectToPeer_DataChannels(long long peerId, bool show, bool connect, bool isLocal);
+
     void onLocalSDP(long long id, QString sdp, QString type);
 
     void onRetmoeSDP(long long id, std::string type, std::string sdp, bool isTextRoom);
-
-    void onRetmoeIce(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate);
 
     void onLocalIceCandidate(long long id, QString sdp_mid, int sdp_mlineindex, QString candidate);
 
@@ -47,11 +50,20 @@ private:
         QString sdp;
     };
 
-    struct RemoteStreamInfo{
+    struct RemoteStreamInfo_VideoAudio{
     public:
-        //rtc::scoped_refptr<WebrtcRemoteStream>    stream;
-        rtc::scoped_refptr<WebrtcStreamVideoAudio>    stream;
-        // rtc::scoped_refptr<WebrtcStreamDataChannels>    stream;
+        rtc::scoped_refptr<WebrtcStreamVideoAudio>    stream_VideoAudio;
+        std::string sdp;
+        std::string sdpType;
+        QVector<iceCandidate> iceCandidateList;
+
+        bool canSendSDP;
+        bool canSendCandidate;
+    };
+
+    struct RemoteStreamInfo_DataChannels{
+    public:
+        rtc::scoped_refptr<WebrtcStreamDataChannels>    stream_DataChannels;
         std::string sdp;
         std::string sdpType;
         QVector<iceCandidate> iceCandidateList;
@@ -61,20 +73,25 @@ private:
     };
 
     static ConferenceManager* instance;
-
+public:
     JanusVideoRoomManager                 mJanusVideoRoomManager;
-    QHash<long long, RemoteStreamInfo>    mRemoteStreamInfos;
+private:
+    QHash<long long, RemoteStreamInfo_VideoAudio>    mRemoteStreamInfos_VideoAudio;
+    QHash<long long, RemoteStreamInfo_DataChannels>    mRemoteStreamInfos_DataChannels;
     QVector<QPair<WINDOWID, long long>>   mRemoteWinds;
     WINDOWID                              mLocalWindow;
-    rtc::scoped_refptr<WebrtcStreamVideoAudio>    LocalStream;
-    //rtc::scoped_refptr<WebrtcStreamDataChannels>    LocalStream;
+    rtc::scoped_refptr<WebrtcStreamVideoAudio>    LocalStream_VideoAudio;
+    rtc::scoped_refptr<WebrtcStreamDataChannels>    LocalStream_DataChannels;
 
 private:
-    // void addStreamInfo(rtc::scoped_refptr<WebrtcRemoteStream> remoteStream);
-    void addStreamInfo(rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream);
-    // void addStreamInfo(rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream);
+    void addStreamInfo_VideoAudio(rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream);
+    void addStreamInfo_DataChannels(rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream);
 
     void sendICEs(long long id, QVector<iceCandidate> &iceCandidateList);
+
+
+    int mTextRoomID;
+    std::string mTextRoomDisplayName;
 };
 
 #endif // QTCONFERENCEMANAGER_H

@@ -20,6 +20,27 @@ void WebRTCInterface::Logout()
 
 }
 
+void WebRTCInterface::JoinVideoRoom(int videoRoomID, std::string userName)
+{
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.JoinVideoRoom(videoRoomID, userName);
+}
+
+void WebRTCInterface::LeaveVideoRoom()
+{
+
+}
+
+void WebRTCInterface::JoinDataChannelRoom(int dataChannelRoomID, std::string userName)
+{
+    ConferenceManager::GetInstance()->SetTextRoomIDAndDisplayName(dataChannelRoomID, userName);
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.JoinTextRoom(dataChannelRoomID);
+}
+
+void WebRTCInterface::LeaveDataChannelRoom()
+{
+
+}
+
 WebRTCInterface *WebRTCInterface::GetInstance()
 {
     if(Instance == NULL){
@@ -35,5 +56,14 @@ void WebRTCInterface::SetVideoWindows(unsigned long localWindow, QVector<unsigne
 
 void WebRTCInterface::SendMessage(std::string message)
 {
-    //ConferenceManager::GetInstance()->GetLocalWebrtcRemoteStream()->SendDataViaDataChannel(message);
+    Json::Value msg;
+    msg["textroom"] = "message";
+    std::string transaction = GetRandomString(12).toStdString();
+    msg["transaction"] = transaction;
+    msg["room"] = ConferenceManager::GetInstance()->GetTextRoomID();
+    msg["text"] = message;
+
+    std::string dataChannelSendMessage = JsonValueToString(msg);
+
+    ConferenceManager::GetInstance()->GetLocalWebrtcStream_DataChannels()->SendDataViaDataChannel(dataChannelSendMessage);
 }

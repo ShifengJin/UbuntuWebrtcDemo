@@ -19,9 +19,14 @@ private:
     Ui::MainWindow *ui;
 
 private Q_SLOTS:
-    void onOnJoinButtonClicked();
-    void onUnJoinButtonClicked();
+    void onLoginButtonClicked();
+    void onLogoutButtonClicked();
     void onSendMessageButtonClicked();
+
+    void onJoinVRoomButtonClicked();
+    void onLeaveVRoomButtonClicked();
+    void onJoinDRoomButtonClicked();
+    void onLeaveDRoomButtonClicked();
 
 private:
     WINDOWID localWindowID;

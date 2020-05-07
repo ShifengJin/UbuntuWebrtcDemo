@@ -14,11 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->Url_LE->setText("ws://192.168.1.104:8188");
+    ui->Url_LE->setText("ws://192.168.1.91:8188");
 
-    this->connect(ui->OnJoin_PB, SIGNAL(clicked()), this, SLOT(onOnJoinButtonClicked()));
-    this->connect(ui->UnJoin_PB, SIGNAL(clicked()), this, SLOT(onUnJoinButtonClicked()));
-    this->connect(ui->SendMessage_PB, SIGNAL(clicked()), this, SLOT(onSendMessageButtonClicked()));
+    this->connect(ui->Login_PB, SIGNAL(clicked()), this, SLOT(onLoginButtonClicked()));
+    this->connect(ui->Logout_PB, SIGNAL(clicked()), this, SLOT(onLogoutButtonClicked()));
+    this->connect(ui->Send_PB, SIGNAL(clicked()), this, SLOT(onSendMessageButtonClicked()));
+    this->connect(ui->JoinVRoom_PB, SIGNAL(clicked()), this, SLOT(onJoinVRoomButtonClicked()));
+    this->connect(ui->LeaveVRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveVRoomButtonClicked()));
+    this->connect(ui->JoinDRoom_PB, SIGNAL(clicked()), this, SLOT(onJoinDRoomButtonClicked()));
+    this->connect(ui->LeaveDRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveDRoomButtonClicked()));
 
     QVector<WINDOWID> remoteWindowID;
     remoteWindowID.push_back((WINDOWID)(ui->Remote_W1->winId()));
@@ -32,12 +36,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    this->disconnect(ui->OnJoin_PB, SIGNAL(clicked()), this, SLOT(onOnJoinButtonClicked()));
-    this->disconnect(ui->UnJoin_PB, SIGNAL(clicked()), this, SLOT(onUnJoinButtonClicked()));
+    this->disconnect(ui->Login_PB, SIGNAL(clicked()), this, SLOT(onLoginButtonClicked()));
+    this->disconnect(ui->Logout_PB, SIGNAL(clicked()), this, SLOT(onLogoutButtonClicked()));
+    this->disconnect(ui->Send_PB, SIGNAL(clicked()), this, SLOT(onSendMessageButtonClicked()));
+
+
+    this->disconnect(ui->JoinVRoom_PB, SIGNAL(clicked()), this, SLOT(onJoinVRoomButtonClicked()));
+    this->disconnect(ui->LeaveVRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveVRoomButtonClicked()));
+    this->disconnect(ui->JoinDRoom_PB, SIGNAL(clicked()), this, SLOT(onJoinDRoomButtonClicked()));
+    this->disconnect(ui->LeaveDRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveDRoomButtonClicked()));
     delete ui;
 }
 
-void MainWindow::onOnJoinButtonClicked()
+void MainWindow::onLoginButtonClicked()
 {
     QString serverUrl = ui->Url_LE->text();
     qDebug() << "onOnJoinButtonClicked ...." << serverUrl;
@@ -48,27 +59,40 @@ void MainWindow::onOnJoinButtonClicked()
     WebRTCInterface::GetInstance()->Login(serverUrl);
 }
 
-void MainWindow::onUnJoinButtonClicked()
+void MainWindow::onLogoutButtonClicked()
 {
-    //QtWebrtcLocalStream::Get()->Unit();
+
 }
 
 void MainWindow::onSendMessageButtonClicked()
 {
-    QString sendMessage = ui->Message_LE->text();
+    QString sendMessage = ui->SendMessage_LE->text();
 
-    qDebug() << "onSendMessageButtonClicked ....  " << sendMessage;
-    Json::Value msg;
-    msg["textroom"] = "message";
-    std::string transaction = GetRandomString(12).toStdString();
-    msg["transaction"] = transaction;
-    msg["room"] = 1234;
-    msg["text"] = sendMessage.toStdString();
+    WebRTCInterface::GetInstance()->SendMessage(sendMessage.toStdString());
+}
 
-    std::string dataChannelSendMessage = JsonValueToString(msg);
+void MainWindow::onJoinVRoomButtonClicked()
+{
+    QString roomID = ui->VideoRoomID_LE->text();
+    int videoroomID = roomID.toInt();
+    WebRTCInterface::GetInstance()->JoinVideoRoom(videoroomID, "JSF");
+}
 
+void MainWindow::onLeaveVRoomButtonClicked()
+{
+    WebRTCInterface::GetInstance()->LeaveVideoRoom();
+}
 
-    WebRTCInterface::GetInstance()->SendMessage(dataChannelSendMessage);
+void MainWindow::onJoinDRoomButtonClicked()
+{
+    QString roomID = ui->DataRoomID_LE->text();
+    int dRoomID = roomID.toInt();
+    WebRTCInterface::GetInstance()->JoinDataChannelRoom(dRoomID, "JSF");
+}
+
+void MainWindow::onLeaveDRoomButtonClicked()
+{
+    WebRTCInterface::GetInstance()->LeaveDataChannelRoom();
 }
 
 void MainWindow::showEvent(QShowEvent *event)

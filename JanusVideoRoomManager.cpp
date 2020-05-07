@@ -151,7 +151,7 @@ void JanusVideoRoomManager::onCreateSessionId(const Json::Value &recvmsg)
     //CreateVideoRoom(mVideoRoomID);
     //CreateTextRoom(mTextRoomID);
 
-    JoinVideoRoom(mVideoRoomID);
+    // JoinVideoRoom(mVideoRoomID);
     // JoinTextRoom(mTextRoomID);
 }
 
@@ -309,15 +309,19 @@ void JanusVideoRoomManager::onTextRoomEventEvent(const Json::Value &recvData)
     onVideoRoomEventSdp(recvData, true);
 }
 
-void JanusVideoRoomManager::JoinVideoRoom(int roomId)
+void JanusVideoRoomManager::JoinVideoRoom(int roomId, std::string videoRoomDisplayName)
 {
+    mVideoRoomID = roomId;
     JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, false, false);
+    peer->SetVideoRoomDisplayName(videoRoomDisplayName);
+
     mVideoRoomPeerList.push_back(peer);
     peer->AttachVideoRoom(roomId);
 }
 
 void JanusVideoRoomManager::JoinTextRoom(int roomId)
 {
+    // mTextRoomID = roomId;
     JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, false, false);
     mTextRoomPeerList.push_back(peer);
     peer->AttachTextRoom(roomId);
@@ -354,7 +358,6 @@ void JanusVideoRoomManager::SendSDP(long long &id, std::string sdp, std::string 
     }
 
     for(auto peer : mTextRoomPeerList){
-        // if(peer->GetHandleId() == id){
         if(peer->GetTextRoomHandleID() == id){
             peer->SendSDPText(sdp, type);
             break;
@@ -363,10 +366,8 @@ void JanusVideoRoomManager::SendSDP(long long &id, std::string sdp, std::string 
 }
 void JanusVideoRoomManager::SendCandidate(long long &id, QString &sdpMid, int &sdpMLineIndex, QString &candidate)
 {
-    // for(auto peer : mPeersList)
     for(auto peer : mVideoRoomPeerList)
     {
-        // if(peer->GetHandleId() == id)
         if(peer->GetVideoRoomHandleID() == id)
         {
             peer->SendCandidate(sdpMid, sdpMLineIndex, candidate);
