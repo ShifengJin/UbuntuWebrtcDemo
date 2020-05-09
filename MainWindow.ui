@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1009</width>
-    <height>577</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>29</x>
       <y>19</y>
       <width>221</width>
-      <height>461</height>
+      <height>671</height>
      </rect>
     </property>
     <property name="title">
@@ -29,10 +29,10 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
+       <x>10</x>
+       <y>20</y>
        <width>198</width>
-       <height>196</height>
+       <height>321</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -54,6 +54,20 @@
            <string>Logout</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QLabel" name="VRDisplayName_LB">
+          <property name="text">
+           <string>VRDisplayName</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="VRDisplayName_LE"/>
         </item>
        </layout>
       </item>
@@ -89,6 +103,20 @@
            <bool>false</bool>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="DRDisplayName_LB">
+          <property name="text">
+           <string>DRDisplayName</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="DRDisplayName_LE"/>
         </item>
        </layout>
       </item>
@@ -130,9 +158,9 @@
      <property name="geometry">
       <rect>
        <x>9</x>
-       <y>249</y>
+       <y>510</y>
        <width>201</width>
-       <height>201</height>
+       <height>151</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -148,6 +176,82 @@
          <widget class="QPushButton" name="Send_PB">
           <property name="text">
            <string>Send</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>350</y>
+       <width>201</width>
+       <height>151</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="VideoRID_LB">
+          <property name="text">
+           <string>VRID</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="VideoRID_LE"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QPushButton" name="CreateVR_PB">
+          <property name="text">
+           <string>Create</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="DestoryVR_PB">
+          <property name="text">
+           <string>Destory</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="DataRID_LB">
+          <property name="text">
+           <string>DRID</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="DataRID_LE"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QPushButton" name="CreateDR_PB">
+          <property name="text">
+           <string>Create</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="DestoryDR_PB">
+          <property name="text">
+           <string>Destory</string>
           </property>
          </widget>
         </item>

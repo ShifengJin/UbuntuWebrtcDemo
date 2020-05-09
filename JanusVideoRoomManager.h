@@ -23,6 +23,8 @@ public:
 
     void CreateVideoRoom(int roomId);
     void CreateTextRoom(int roomId);
+    void DestoryVideoRoom(int roomId);
+    void DestoryTextRoom(int roomId);
 
     void JoinVideoRoom(int roomId, std::string videoRoomDisplayName);
     void JoinTextRoom(int roomId);
@@ -87,6 +89,9 @@ private:
 
     std::list<JanusPeerConnection*>      mVideoRoomPeerList;
     std::list<JanusPeerConnection*>      mTextRoomPeerList;
+
+    JanusPeerConnection*                 pCreateVideoRoomPeer = NULL;
+    JanusPeerConnection*                 pCreateTextRoomPeer = NULL;
 
     CONNECTTOPEER_CALLBACK               OnConnectToPeer;
     REMOTESDP_CALLBACK                   OnRemoteSdp;

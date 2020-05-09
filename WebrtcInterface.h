@@ -16,10 +16,15 @@ public:
     void JoinVideoRoom(int videoRoomID, std::string userName);
     void LeaveVideoRoom();
 
+    void CreateVideoRoom(int roomId);
+    void DestoryVideoRoom(int roomId);
+
     void JoinDataChannelRoom(int dataChannelRoomID, std::string userName);
     void LeaveDataChannelRoom();
     void SendMessage(std::string message);
 
+    void CreateTextRoom(int roomId);
+    void DestoryTextRoom(int roomId);
 
     static WebRTCInterface* GetInstance();
 

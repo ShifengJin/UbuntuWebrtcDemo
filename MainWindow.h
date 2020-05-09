@@ -28,6 +28,11 @@ private Q_SLOTS:
     void onJoinDRoomButtonClicked();
     void onLeaveDRoomButtonClicked();
 
+    void onCreateVRButtonClicked();
+    void onDestoryVRButtonClicked();
+    void onCreateDRButtonClicked();
+    void onDestoryDRButtonClicked();
+
 private:
     WINDOWID localWindowID;
 

@@ -3,14 +3,11 @@
 #include "JsonTools.h"
 #include "JanusVideoRoomManager.h"
 
-JanusPeerConnection::JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId, bool tIsVideoRoomCreate, bool tIsTextRoomCreate)
+JanusPeerConnection::JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId)
 {
     pVideoRoomManager = tpVideoRoomManager;
     pWebSocket = tpWebSocket;
     mSessionID = tSessionId;
-    isVideoRoomCreate = tIsVideoRoomCreate;
-    isTextRoomCreate = tIsTextRoomCreate;
-
 }
 
 JanusPeerConnection::~JanusPeerConnection()
@@ -44,11 +41,9 @@ void JanusPeerConnection::AttachVideoRoom(int roomId)
 
     mVideoRoomId = roomId;
 
-    if(isVideoRoomCreate){
-        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomCreate, this, std::placeholders::_1));
-    }else{
-        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomJoin, this, std::placeholders::_1));
-    }
+
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomJoin, this, std::placeholders::_1));
+
 }
 
 void JanusPeerConnection::AttachTextRoom(int roomId)
@@ -67,11 +62,61 @@ void JanusPeerConnection::AttachTextRoom(int roomId)
     pWebSocket->SendMessage(SendMsg);
 
     mTextRoomId = roomId;
-    if(isTextRoomCreate){
-        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomCreate, this, std::placeholders::_1));
-    }else{
-        ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomJoin, this, std::placeholders::_1));
-    }
+
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomJoin, this, std::placeholders::_1));
+
+}
+
+void JanusPeerConnection::CreateVideoRoom(int roomId)
+{
+    Json::Value msg;
+    msg["janus"] = "attach";
+
+    msg["plugin"] = "janus.plugin.videoroom";
+
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+
+    mVideoRoomId = roomId;
+
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachVideoRoomCreate, this, std::placeholders::_1));
+
+}
+
+void JanusPeerConnection::CreateTextRoom(int roomId)
+{
+    Json::Value msg;
+    msg["janus"] = "attach";
+
+    msg["plugin"] = "janus.plugin.textroom";
+
+    QString transaction = GetRandomString(12);
+    msg["transaction"] = transaction.toStdString();
+
+    msg["session_id"] = (double)mSessionID;
+
+    QString SendMsg = JsonValueToQString(msg);
+    pWebSocket->SendMessage(SendMsg);
+
+    mTextRoomId = roomId;
+
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onAttachTextRoomCreate, this, std::placeholders::_1));
+
+}
+
+void JanusPeerConnection::DestoryVideoRoom(int roomId)
+{
+
+}
+
+void JanusPeerConnection::DestoryTextRoom(int roomId)
+{
+
 }
 
 void JanusPeerConnection::SetSubscribe(long long id)
@@ -199,6 +244,9 @@ void JanusPeerConnection::createVideoRoom()
 
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);
+
+    // 此处添加创建房间成功或失败的回调函数
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onCreateVideoRoom, this, std::placeholders::_1));
 }
 
 void JanusPeerConnection::createTextRoom()
@@ -216,6 +264,19 @@ void JanusPeerConnection::createTextRoom()
     msg["body"] = body;
     QString SendMsg = JsonValueToQString(msg);
     pWebSocket->SendMessage(SendMsg);
+
+    // 此处添加创建房间成功或失败的回调函数
+    ((JanusVideoRoomManager*)pVideoRoomManager)->AddMessageSuccessCallback(transaction, std::bind(&JanusPeerConnection::onCreateTextRoom, this, std::placeholders::_1));
+}
+
+void JanusPeerConnection::onCreateVideoRoom(const Json::Value &recvMsg)
+{
+
+}
+
+void JanusPeerConnection::onCreateTextRoom(const Json::Value &recvMsg)
+{
+
 }
 
 void JanusPeerConnection::SendSDP(std::string sdp, std::string type)

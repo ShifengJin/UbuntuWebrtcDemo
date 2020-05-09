@@ -53,14 +53,34 @@ void JanusVideoRoomManager::AddMessageAckCallback(QString tran, const janus_even
 
 void JanusVideoRoomManager::CreateVideoRoom(int roomId)
 {
-    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, true, false);
-    peer->AttachVideoRoom(roomId);
+    if(pCreateVideoRoomPeer == NULL){
+        pCreateVideoRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+    }
+    pCreateVideoRoomPeer->CreateVideoRoom(roomId);
 }
 
 void JanusVideoRoomManager::CreateTextRoom(int roomId)
 {
-    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId,false, true);
-    peer->AttachTextRoom(roomId);
+    if(pCreateTextRoomPeer == NULL){
+        pCreateTextRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+    }
+    pCreateTextRoomPeer->CreateTextRoom(roomId);
+}
+
+void JanusVideoRoomManager::DestoryVideoRoom(int roomId)
+{
+    if(pCreateVideoRoomPeer == NULL){
+        pCreateVideoRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+    }
+    pCreateVideoRoomPeer->DestoryVideoRoom(roomId);
+}
+
+void JanusVideoRoomManager::DestoryTextRoom(int roomId)
+{
+    if(pCreateTextRoomPeer == NULL){
+        pCreateTextRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+    }
+    pCreateTextRoomPeer->DestoryTextRoom(roomId);
 }
 
 void JanusVideoRoomManager::onSocketConnected()
@@ -220,7 +240,7 @@ void JanusVideoRoomManager::onVideoRoomEventPublisher(const Json::Value &recvDat
     for(const auto publishersRef : publishersArr){
         long long id = JsonValueToLongLong(publishersRef, "id");
         if(id > 0){
-            JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, false, false);
+            JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId);
             mVideoRoomPeerList.push_back(peer);
             peer->SetSubscribe(id);
             peer->SetPrivateId(mPrivatedId);
@@ -312,7 +332,7 @@ void JanusVideoRoomManager::onTextRoomEventEvent(const Json::Value &recvData)
 void JanusVideoRoomManager::JoinVideoRoom(int roomId, std::string videoRoomDisplayName)
 {
     mVideoRoomID = roomId;
-    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, false, false);
+    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId);
     peer->SetVideoRoomDisplayName(videoRoomDisplayName);
 
     mVideoRoomPeerList.push_back(peer);
@@ -322,7 +342,7 @@ void JanusVideoRoomManager::JoinVideoRoom(int roomId, std::string videoRoomDispl
 void JanusVideoRoomManager::JoinTextRoom(int roomId)
 {
     // mTextRoomID = roomId;
-    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId, false, false);
+    JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId);
     mTextRoomPeerList.push_back(peer);
     peer->AttachTextRoom(roomId);
 }

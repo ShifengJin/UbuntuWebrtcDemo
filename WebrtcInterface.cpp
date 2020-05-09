@@ -30,6 +30,16 @@ void WebRTCInterface::LeaveVideoRoom()
 
 }
 
+void WebRTCInterface::CreateVideoRoom(int roomId)
+{
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.CreateVideoRoom(roomId);
+}
+
+void WebRTCInterface::DestoryVideoRoom(int roomId)
+{
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.DestoryVideoRoom(roomId);
+}
+
 void WebRTCInterface::JoinDataChannelRoom(int dataChannelRoomID, std::string userName)
 {
     ConferenceManager::GetInstance()->SetTextRoomIDAndDisplayName(dataChannelRoomID, userName);
@@ -66,4 +76,14 @@ void WebRTCInterface::SendMessage(std::string message)
     std::string dataChannelSendMessage = JsonValueToString(msg);
 
     ConferenceManager::GetInstance()->GetLocalWebrtcStream_DataChannels()->SendDataViaDataChannel(dataChannelSendMessage);
+}
+
+void WebRTCInterface::CreateTextRoom(int roomId)
+{
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.CreateTextRoom(roomId);
+}
+
+void WebRTCInterface::DestoryTextRoom(int roomId)
+{
+    ConferenceManager::GetInstance()->mJanusVideoRoomManager.DestoryTextRoom(roomId);
 }

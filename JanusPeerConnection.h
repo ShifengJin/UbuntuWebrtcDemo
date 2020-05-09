@@ -9,7 +9,7 @@
 class JanusPeerConnection
 {
 public:
-    JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId, bool tIsVideoRoomCreate, bool tIsTextRoomCreate);
+    JanusPeerConnection(void *tpVideoRoomManager, JanusWebSocket *tpWebSocket, long long int tSessionId);
     ~JanusPeerConnection();
 
     void SetVideoRoomDisplayName(std::string name);
@@ -17,6 +17,11 @@ public:
 
     void AttachVideoRoom(int roomId);
     void AttachTextRoom(int roomId);
+
+    void CreateVideoRoom(int roomId);
+    void CreateTextRoom(int roomId);
+    void DestoryVideoRoom(int roomId);
+    void DestoryTextRoom(int roomId);
 
     void SetSubscribe(long long id);
     void SetPrivateId(long long id);
@@ -41,6 +46,9 @@ private:
     void createVideoRoom();
     void createTextRoom();
 
+    void onCreateVideoRoom(const Json::Value &recvMsg);
+    void onCreateTextRoom(const Json::Value &recvMsg);
+
 private:
     void               *pVideoRoomManager;
     JanusWebSocket     *pWebSocket;
@@ -54,9 +62,6 @@ private:
     int mTextRoomId;
     std::string mVideoRoomDisplayName = "cc";
     std::string mTextRoomDisplayName = "cc";
-
-    bool isVideoRoomCreate = false;
-    bool isTextRoomCreate = false;
 };
 
 #endif // JANUSPEERCONNECTION_H
