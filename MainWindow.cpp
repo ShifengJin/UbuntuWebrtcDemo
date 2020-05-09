@@ -48,6 +48,11 @@ MainWindow::~MainWindow()
     this->disconnect(ui->LeaveVRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveVRoomButtonClicked()));
     this->disconnect(ui->JoinDRoom_PB, SIGNAL(clicked()), this, SLOT(onJoinDRoomButtonClicked()));
     this->disconnect(ui->LeaveDRoom_PB, SIGNAL(clicked()), this, SLOT(onLeaveDRoomButtonClicked()));
+
+    this->disconnect(ui->CreateVR_PB, SIGNAL(clicked()), this, SLOT(onCreateVRButtonClicked()));
+    this->disconnect(ui->DestoryVR_PB, SIGNAL(clicked()), this, SLOT(onDestoryVRButtonClicked()));
+    this->disconnect(ui->CreateDR_PB, SIGNAL(clicked()), this, SLOT(onCreateDRButtonClicked()));
+    this->disconnect(ui->DestoryDR_PB, SIGNAL(clicked()), this, SLOT(onDestoryDRButtonClicked()));
     delete ui;
 }
 

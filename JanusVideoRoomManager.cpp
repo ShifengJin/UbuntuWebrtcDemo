@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "JanusVideoRoomManager.h"
 #include "JanusPeerConnection.h"
 
@@ -55,6 +55,10 @@ void JanusVideoRoomManager::CreateVideoRoom(int roomId)
 {
     if(pCreateVideoRoomPeer == NULL){
         pCreateVideoRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+        pCreateVideoRoomPeer->RegisterCreateTextRoomFailed(std::bind(&JanusVideoRoomManager::onCreateTextRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateVideoRoomPeer->CreateVideoRoom(roomId);
 }
@@ -63,6 +67,10 @@ void JanusVideoRoomManager::CreateTextRoom(int roomId)
 {
     if(pCreateTextRoomPeer == NULL){
         pCreateTextRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+        pCreateTextRoomPeer->RegisterCreateTextRoomFailed(std::bind(&JanusVideoRoomManager::onCreateTextRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateTextRoomPeer->CreateTextRoom(roomId);
 }
@@ -71,6 +79,10 @@ void JanusVideoRoomManager::DestoryVideoRoom(int roomId)
 {
     if(pCreateVideoRoomPeer == NULL){
         pCreateVideoRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+        pCreateVideoRoomPeer->RegisterCreateTextRoomFailed(std::bind(&JanusVideoRoomManager::onCreateTextRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateVideoRoomPeer->DestoryVideoRoom(roomId);
 }
@@ -79,6 +91,10 @@ void JanusVideoRoomManager::DestoryTextRoom(int roomId)
 {
     if(pCreateTextRoomPeer == NULL){
         pCreateTextRoomPeer = new JanusPeerConnection(this, pWebSocket, mSessionId);
+        pCreateTextRoomPeer->RegisterCreateTextRoomFailed(std::bind(&JanusVideoRoomManager::onCreateTextRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateTextRoomPeer->DestoryTextRoom(roomId);
 }
@@ -108,14 +124,9 @@ void JanusVideoRoomManager::onWebSocketReceivedMessage(QString message)
         GetStringFromJsonObject(object, "transaction", &transaction);
 
         if(janus == "success"){
-            Json::Value dataObj;
-            GetValueFromJsonObject(object, "data", &dataObj);
-
-            onMessageSuccess(transaction, dataObj);
+            onMessageSuccess(transaction, object);
         }else if(janus == "ack"){
-            Json::Value dataObj;
-            GetValueFromJsonObject(object, "data", &dataObj);
-            onMessageAck(transaction, dataObj);
+            onMessageAck(transaction, object);
         }else if(janus == "event"){
             Json::Value plugindataObj;
             GetValueFromJsonObject(object, "plugindata", &plugindataObj);
@@ -166,7 +177,9 @@ void JanusVideoRoomManager::createSessionId()
 
 void JanusVideoRoomManager::onCreateSessionId(const Json::Value &recvmsg)
 {
-    mSessionId = JsonValueToLongLong(recvmsg, "id");
+    Json::Value dataObj;
+    GetValueFromJsonObject(recvmsg, "data", &dataObj);
+    mSessionId = JsonValueToLongLong(dataObj, "id");
 
     //CreateVideoRoom(mVideoRoomID);
     //CreateTextRoom(mTextRoomID);
@@ -177,6 +190,8 @@ void JanusVideoRoomManager::onCreateSessionId(const Json::Value &recvmsg)
 
 void JanusVideoRoomManager::onHeartBeat(const Json::Value &recvmsg)
 {
+    Json::Value dataObj;
+    GetValueFromJsonObject(recvmsg, "data", &dataObj);
     pWebSocket->ResetTimer();
 }
 
@@ -327,6 +342,26 @@ void JanusVideoRoomManager::onVideoRoomEventEvent(const Json::Value &recvData)
 void JanusVideoRoomManager::onTextRoomEventEvent(const Json::Value &recvData)
 {
     onVideoRoomEventSdp(recvData, true);
+}
+
+void JanusVideoRoomManager::onCreateVideoRoomSuccessed(unsigned int roomId)
+{
+    std::cout << " ====== create video room successed. roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onCreateVideoRoomFailed(unsigned int roomId)
+{
+    std::cout << " ====== create video room failed. roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onCreateTextRoomSuccessed(unsigned int roomId)
+{
+    std::cout << " ====== create text room successed. roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onCreateTextRoomFailed(unsigned int roomId)
+{
+    std::cout << " ====== create text room failed. roomID : " << roomId << std::endl;
 }
 
 void JanusVideoRoomManager::JoinVideoRoom(int roomId, std::string videoRoomDisplayName)

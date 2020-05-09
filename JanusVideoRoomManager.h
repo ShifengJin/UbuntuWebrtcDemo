@@ -72,6 +72,11 @@ private:
     void onVideoRoomEventEvent(const Json::Value &recvData);
 
     void onTextRoomEventEvent(const Json::Value &recvData);
+
+    void onCreateVideoRoomSuccessed(unsigned int roomId);
+    void onCreateVideoRoomFailed(unsigned int roomId);
+    void onCreateTextRoomSuccessed(unsigned int roomId);
+    void onCreateTextRoomFailed(unsigned int roomId);
 private:
     JanusWebSocket          *pWebSocket;
 

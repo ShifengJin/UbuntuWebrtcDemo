@@ -6,6 +6,8 @@
 #include "JsonTools.h"
 #include "JanusWebSocket.h"
 
+typedef std::function<void(unsigned int)> CREATEROOM_CALLBACK;
+
 class JanusPeerConnection
 {
 public:
@@ -40,15 +42,23 @@ private:
     void onAttachTextRoomJoin(const Json::Value &recvMsg);
     void onAttachTextRoomCreate(const Json::Value &recvMsg);
 
+    void onAttachVideoRoomDestory(const Json::Value &recvMsg);
+    void onAttachTextRoomDestory(const Json::Value &recvMsg);
+
     void joinVideoRoom();
     void joinTextRoom();
 
     void createVideoRoom();
     void createTextRoom();
 
+    void destoryVideoRoom();
+    void destoryTextRoom();
+
     void onCreateVideoRoom(const Json::Value &recvMsg);
     void onCreateTextRoom(const Json::Value &recvMsg);
 
+    void onDestoryVideoRoom(const Json::Value &recvMsg);
+    void onDestoryTextRoom(const Json::Value &recvMsg);
 private:
     void               *pVideoRoomManager;
     JanusWebSocket     *pWebSocket;
@@ -62,6 +72,20 @@ private:
     int mTextRoomId;
     std::string mVideoRoomDisplayName = "cc";
     std::string mTextRoomDisplayName = "cc";
+
+public:
+    void RegisterCreateVideoRoomSuccessed(CREATEROOM_CALLBACK callback);
+    void RegisterCreateVideoRoomFailed(CREATEROOM_CALLBACK callback);
+    void RegisterCreateTextRoomSuccessed(CREATEROOM_CALLBACK callback);
+    void RegisterCreateTextRoomFailed(CREATEROOM_CALLBACK callback);
+
+private:
+    CREATEROOM_CALLBACK          onCreateVideoRoomSuccessedCallback;
+    CREATEROOM_CALLBACK          onCreateVideoRoomFailedCallback;
+
+    CREATEROOM_CALLBACK          onCreateTextRoomSuccessedCallback;
+    CREATEROOM_CALLBACK          onCreateTextRoomFailedCallback;
+
 };
 
 #endif // JANUSPEERCONNECTION_H
