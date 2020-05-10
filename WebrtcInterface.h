@@ -14,7 +14,7 @@ public:
     void Logout();
 
     void JoinVideoRoom(int videoRoomID, std::string userName);
-    void LeaveVideoRoom();
+    void LeaveVideoRoom(unsigned int videoRoomId);
 
     void CreateVideoRoom(int roomId);
     void DestoryVideoRoom(int roomId);

@@ -29,6 +29,39 @@ JanusVideoRoomManager::JanusVideoRoomManager()
 JanusVideoRoomManager::~JanusVideoRoomManager()
 {
 
+    delete pWebSocket;
+    for(auto iter = mVideoRoomPeerList.begin(); iter != mVideoRoomPeerList.end();){
+        delete (*iter);
+        iter = mVideoRoomPeerList.erase(iter);
+    }
+    mVideoRoomPeerList.clear();
+
+    for(auto iter = mTextRoomPeerList.begin(); iter != mTextRoomPeerList.end();){
+        delete (*iter);
+        iter = mTextRoomPeerList.erase(iter);
+    }
+    mTextRoomPeerList.clear();
+
+    if(pCreateVideoRoomPeer){
+        delete pCreateVideoRoomPeer;
+        pCreateVideoRoomPeer = NULL;
+    }
+    if(pCreateTextRoomPeer){
+        delete pCreateTextRoomPeer;
+        pCreateTextRoomPeer = NULL;
+    }
+
+
+    mMessage_success_callback.clear();
+    mMessage_ack_callback.clear();
+
+    mMessage_event_videoRoom.clear();
+    mMessage_event_textRoom.clear();
+
+
+    OnConnectToPeer = NULL;
+    OnRemoteSdp = NULL;
+    OnRemoteStreamRemove = NULL;
 }
 
 void JanusVideoRoomManager::ConnectServer(const std::string &server)
@@ -59,6 +92,12 @@ void JanusVideoRoomManager::CreateVideoRoom(int roomId)
         pCreateVideoRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
         pCreateVideoRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
         pCreateVideoRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
+
+        pCreateVideoRoomPeer->RegisterDestroyTextRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyVideoRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomSuccessed, this, std::placeholders::_1));
+
     }
     pCreateVideoRoomPeer->CreateVideoRoom(roomId);
 }
@@ -71,6 +110,11 @@ void JanusVideoRoomManager::CreateTextRoom(int roomId)
         pCreateTextRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
         pCreateTextRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
         pCreateTextRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
+
+        pCreateTextRoomPeer->RegisterDestroyTextRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyVideoRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateTextRoomPeer->CreateTextRoom(roomId);
 }
@@ -83,6 +127,11 @@ void JanusVideoRoomManager::DestoryVideoRoom(int roomId)
         pCreateVideoRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
         pCreateVideoRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
         pCreateVideoRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
+
+        pCreateVideoRoomPeer->RegisterDestroyTextRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyVideoRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomFailed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateVideoRoomPeer->RegisterDestroyVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateVideoRoomPeer->DestoryVideoRoom(roomId);
 }
@@ -95,6 +144,11 @@ void JanusVideoRoomManager::DestoryTextRoom(int roomId)
         pCreateTextRoomPeer->RegisterCreateVideoRoomFailed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomFailed, this, std::placeholders::_1));
         pCreateTextRoomPeer->RegisterCreateTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateTextRoomSuccessed, this, std::placeholders::_1));
         pCreateTextRoomPeer->RegisterCreateVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onCreateVideoRoomSuccessed, this, std::placeholders::_1));
+
+        pCreateTextRoomPeer->RegisterDestroyTextRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyVideoRoomFailed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomFailed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyTextRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyTextRoomSuccessed, this, std::placeholders::_1));
+        pCreateTextRoomPeer->RegisterDestroyVideoRoomSuccessed(std::bind(&JanusVideoRoomManager::onDestroyVideoRoomSuccessed, this, std::placeholders::_1));
     }
     pCreateTextRoomPeer->DestoryTextRoom(roomId);
 }
@@ -364,6 +418,26 @@ void JanusVideoRoomManager::onCreateTextRoomFailed(unsigned int roomId)
     std::cout << " ====== create text room failed. roomID : " << roomId << std::endl;
 }
 
+void JanusVideoRoomManager::onDestroyVideoRoomSuccessed(unsigned int roomId)
+{
+    std::cout << " ====== destroy video room successed. ====== roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onDestroyVideoRoomFailed(unsigned int roomId)
+{
+    std::cout << " ====== destroy video room failed. ====== roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onDestroyTextRoomSuccessed(unsigned int roomId)
+{
+    std::cout << " ====== destroy text room successed. ====== roomID : " << roomId << std::endl;
+}
+
+void JanusVideoRoomManager::onDestroyTextRoomFailed(unsigned int roomId)
+{
+    std::cout << " ====== destroy text room failed. ====== roomID : " << roomId << std::endl;
+}
+
 void JanusVideoRoomManager::JoinVideoRoom(int roomId, std::string videoRoomDisplayName)
 {
     mVideoRoomID = roomId;
@@ -380,6 +454,24 @@ void JanusVideoRoomManager::JoinTextRoom(int roomId)
     JanusPeerConnection *peer = new JanusPeerConnection(this, pWebSocket, mSessionId);
     mTextRoomPeerList.push_back(peer);
     peer->AttachTextRoom(roomId);
+}
+
+void JanusVideoRoomManager::LeaveVideoRoom(unsigned int roomId)
+{
+    for(auto iter = mVideoRoomPeerList.begin(); iter != mVideoRoomPeerList.end();){
+        delete (*iter);
+        iter = mVideoRoomPeerList.erase(iter);
+    }
+    mVideoRoomPeerList.clear();
+}
+
+void JanusVideoRoomManager::LeaveTextRoom(unsigned int roomId)
+{
+    for(auto iter = mTextRoomPeerList.begin(); iter != mTextRoomPeerList.end();){
+        delete (*iter);
+        iter = mTextRoomPeerList.erase(iter);
+    }
+    mTextRoomPeerList.clear();
 }
 
 void JanusVideoRoomManager::RegisterConnectToPeerCallBack(CONNECTTOPEER_CALLBACK callback)

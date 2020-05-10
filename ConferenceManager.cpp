@@ -2,7 +2,7 @@
 #include "JsonTools.h"
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <iostream>
 #include "WebrtcStreamVideoAudio.h"
 #include "Common.h"
 
@@ -10,19 +10,44 @@ ConferenceManager* ConferenceManager::instance = NULL;
 
 ConferenceManager::ConferenceManager(QObject *parent) : QObject(parent)
 {
-    mJanusVideoRoomManager.RegisterConnectToPeerCallBack(std::bind(&ConferenceManager::ConnectToPeer_VideoAudio, this,
+    pJanusVideoRoomManager = new JanusVideoRoomManager();
+
+    pJanusVideoRoomManager->RegisterConnectToPeerCallBack(std::bind(&ConferenceManager::ConnectToPeer_VideoAudio, this,
                                                                     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteSdpCallBack(std::bind(&ConferenceManager::onRetmoeSDP, this,
+    pJanusVideoRoomManager->RegisterRemoteSdpCallBack(std::bind(&ConferenceManager::onRetmoeSDP, this,
                                                                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
-    mJanusVideoRoomManager.RegisterRemoteStreamRemoveCallBack(std::bind(&ConferenceManager::onRemoteStreamRemove, this,
+    pJanusVideoRoomManager->RegisterRemoteStreamRemoveCallBack(std::bind(&ConferenceManager::onRemoteStreamRemove, this,
                                                                          std::placeholders::_1));
 }
 
 ConferenceManager::~ConferenceManager()
 {
+    delete pJanusVideoRoomManager;
+    pJanusVideoRoomManager = NULL;
 
+    for(auto iter = mRemoteStreamInfos_VideoAudio.begin(); iter != mRemoteStreamInfos_VideoAudio.end(); iter ++){
+        iter.value().stream_VideoAudio->StopView();
+        std::cout << "Stop view" << std::endl;
+        delete iter.value().stream_VideoAudio.release();
+    }
+    mRemoteStreamInfos_VideoAudio.clear();
+
+    for(auto iter = mRemoteStreamInfos_DataChannels.begin(); iter != mRemoteStreamInfos_DataChannels.end(); iter ++){
+        iter.value().stream_DataChannels->CloseDataChannel();
+        delete iter.value().stream_DataChannels.release();
+    }
+    mRemoteStreamInfos_DataChannels.clear();
+
+    mRemoteWinds.clear();
+
+    mLocalWindow = 0;
+
+    delete LocalStream_DataChannels.release();
+
+
+    ConferenceManager::instance = NULL;
 }
 
 ConferenceManager *ConferenceManager::GetInstance()
@@ -35,7 +60,7 @@ ConferenceManager *ConferenceManager::GetInstance()
 
 void ConferenceManager::Login(std::string &server)
 {
-    mJanusVideoRoomManager.ConnectServer(server);
+    pJanusVideoRoomManager->ConnectServer(server);
 }
 
 void ConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned long> remote)
@@ -47,11 +72,6 @@ void ConferenceManager::SetVideoWindows(unsigned long local, QVector<unsigned lo
     }
 }
 
-rtc::scoped_refptr<WebrtcStreamVideoAudio> ConferenceManager::GetLocalWebrtcStream_VideoAudio()
-{
-    return LocalStream_VideoAudio;
-}
-
 rtc::scoped_refptr<WebrtcStreamDataChannels> ConferenceManager::GetLocalWebrtcStream_DataChannels()
 {
     return LocalStream_DataChannels;
@@ -61,6 +81,19 @@ void ConferenceManager::SetTextRoomIDAndDisplayName(int inTextRoomID, std::strin
 {
     mTextRoomID = inTextRoomID;
     mTextRoomDisplayName = inDisplayName;
+}
+
+void ConferenceManager::LeaveVideoRoom()
+{
+    for(int i = 0; i < mRemoteWinds.size(); ++ i){
+        mRemoteWinds[i].second = 0;
+    }
+    for(auto iter = mRemoteStreamInfos_VideoAudio.begin(); iter != mRemoteStreamInfos_VideoAudio.end(); iter ++){
+        iter.value().stream_VideoAudio->StopView();
+        std::cout << "Stop view" << std::endl;
+        delete iter.value().stream_VideoAudio.release();
+    }
+    mRemoteStreamInfos_VideoAudio.clear();
 }
 
 void ConferenceManager::addStreamInfo_VideoAudio(rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream)
@@ -84,7 +117,6 @@ void ConferenceManager::addStreamInfo_DataChannels(rtc::scoped_refptr<WebrtcStre
     stream.canSendSDP = true;
     stream.canSendCandidate = true;
 
-    // long long peerId = remoteStream->id();
     long long peerId = remoteStream->GetHandleID();
 
     mRemoteStreamInfos_DataChannels[peerId] = stream;
@@ -96,7 +128,7 @@ void ConferenceManager::sendICEs(long long id, QVector<ConferenceManager::iceCan
     {
         auto candidate = iceCandidateList.front();
         iceCandidateList.pop_front();
-        mJanusVideoRoomManager.SendCandidate(id,candidate.sdp_mid,candidate.sdp_mline_index,candidate.sdp);
+        pJanusVideoRoomManager->SendCandidate(id,candidate.sdp_mid,candidate.sdp_mline_index,candidate.sdp);
     }
 }
 
@@ -105,10 +137,6 @@ void ConferenceManager::ConnectToPeer_VideoAudio(long long peerId, bool show, bo
 {
     rtc::scoped_refptr<WebrtcStreamVideoAudio> remoteStream = new rtc::RefCountedObject<WebrtcStreamVideoAudio>(peerId);
     remoteStream->SetIsLocal(isLocal);
-
-    if(isLocal){
-        LocalStream_VideoAudio = remoteStream;
-    }
 
     connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
     connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
@@ -130,13 +158,14 @@ void ConferenceManager::ConnectToPeer_VideoAudio(long long peerId, bool show, bo
     }
 }
 
-void ConferenceManager::ConnectToPeer_DataChannels(long long peerId, bool show, bool isConnect, bool isLocal)
+// void ConferenceManager::ConnectToPeer_DataChannels(long long peerId, bool show, bool isConnect, bool isLocal)
+void ConferenceManager::ConnectToPeer_DataChannels(long long peerId)
 {
     rtc::scoped_refptr<WebrtcStreamDataChannels> remoteStream = new rtc::RefCountedObject<WebrtcStreamDataChannels>(peerId);
 
-    if(isLocal){
+    //if(isLocal){
         LocalStream_DataChannels = remoteStream;
-    }
+    //}
 
     connect(remoteStream, SIGNAL(LocalSDP(long long, QString, QString)), this, SLOT(onLocalSDP(long long, QString, QString)));
     connect(remoteStream, SIGNAL(LocalIceCandidate(long long, QString, int, QString)), this, SLOT(onLocalIceCandidate(long long, QString, int, QString)));
@@ -155,7 +184,7 @@ void ConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
         remoteStreamState.sdp = sdp.toStdString();
         remoteStreamState.sdpType = type.toStdString();
         if(remoteStreamState.canSendSDP){
-            mJanusVideoRoomManager.SendSDP(id, sdp.toStdString(), type.toStdString());
+            pJanusVideoRoomManager->SendSDP(id, sdp.toStdString(), type.toStdString());
         }
     }
 
@@ -167,7 +196,7 @@ void ConferenceManager::onLocalSDP(long long id, QString sdp, QString type)
         remoteStreamState.sdp = sdp.toStdString();
         remoteStreamState.sdpType = type.toStdString();
         if(remoteStreamState.canSendSDP){
-            mJanusVideoRoomManager.SendSDP(id, sdp.toStdString(), type.toStdString());
+            pJanusVideoRoomManager->SendSDP(id, sdp.toStdString(), type.toStdString());
         }
     }
 
@@ -211,7 +240,8 @@ void ConferenceManager::onRetmoeSDP(long long id, std::string type, std::string 
         auto itr_DC = mRemoteStreamInfos_DataChannels.find(id);
         if(itr_DC == mRemoteStreamInfos_DataChannels.end())
         {
-            ConnectToPeer_DataChannels(id, false, false, true);
+            // ConnectToPeer_DataChannels(id, false, false, true);
+            ConnectToPeer_DataChannels(id);
 
             itr_DC = mRemoteStreamInfos_DataChannels.find(id);
             if(itr_DC == mRemoteStreamInfos_DataChannels.end())
@@ -246,7 +276,7 @@ void ConferenceManager::onRemoteStreamRemove(long long streamId)
     auto itr_VA = mRemoteStreamInfos_VideoAudio.find(streamId);
     if(itr_VA != mRemoteStreamInfos_VideoAudio.end())
     {
-        mJanusVideoRoomManager.DisconnectPeer(itr_VA->stream_VideoAudio->GetHandleID());
+        pJanusVideoRoomManager->DisconnectPeer(itr_VA->stream_VideoAudio->GetHandleID());
         itr_VA->stream_VideoAudio->DeletePeerConnection();
         mRemoteStreamInfos_VideoAudio.erase(itr_VA);
     }
@@ -263,7 +293,7 @@ void ConferenceManager::onRemoteStreamRemove(long long streamId)
     auto itr_DC = mRemoteStreamInfos_DataChannels.find(streamId);
     if(itr_DC != mRemoteStreamInfos_DataChannels.end())
     {
-        mJanusVideoRoomManager.DisconnectPeer(itr_DC->stream_DataChannels->GetHandleID());
+        pJanusVideoRoomManager->DisconnectPeer(itr_DC->stream_DataChannels->GetHandleID());
         itr_DC->stream_DataChannels->DeletePeerConnection();
         mRemoteStreamInfos_DataChannels.erase(itr_DC);
     }
@@ -280,11 +310,9 @@ void ConferenceManager::onSendLocalInfoWhenOpenDataChannel(std::string &data)
     msg["textroom"] = "join";
     std::string transaction = GetRandomString(12).toStdString();
     msg["transaction"] = transaction;
-    // msg["room"] = 1234;
     msg["room"] = mTextRoomID;
     std::string username = GetRandomString(12).toStdString();
     msg["username"] = username;
-    // msg["display"] = "cc";
     msg["display"] = mTextRoomDisplayName.c_str();
     data = JsonValueToString(msg);
 }

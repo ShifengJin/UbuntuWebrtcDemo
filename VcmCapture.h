@@ -8,16 +8,16 @@
 #include <webrtc/modules/video_capture/video_capture.h>
 #include "VideoCapture.h"
 
-#define ALVA_WEBRTC_USE_WEBRTCCAPTURE 1
+#define ALVA_WEBRTC_USE_WEBRTCCAPTURE 0
 
 #if ALVA_WEBRTC_USE_WEBRTCCAPTURE
 
 #else
 #include <pthread.h>
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/videoio.hpp>
+// #include <opencv2/core.hpp>
+// #include <opencv2/imgproc.hpp>
+// #include <opencv2/highgui.hpp>
+// #include <opencv2/videoio.hpp>
 #endif
 
 
@@ -72,7 +72,7 @@ private:
     int videoWidth;
     int videoHeight;
     unsigned char* pBufYuvI420;
-    cv::VideoCapture   *m_capture;
+    // cv::VideoCapture   *m_capture;
     pthread_t           cameraThread;
 #endif
 

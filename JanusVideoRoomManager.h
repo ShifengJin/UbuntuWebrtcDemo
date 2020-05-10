@@ -29,6 +29,10 @@ public:
     void JoinVideoRoom(int roomId, std::string videoRoomDisplayName);
     void JoinTextRoom(int roomId);
 
+    void LeaveVideoRoom(unsigned int roomId);
+    void LeaveTextRoom(unsigned int roomId);
+
+
     void RegisterConnectToPeerCallBack(CONNECTTOPEER_CALLBACK callback);
     void RegisterRemoteSdpCallBack(REMOTESDP_CALLBACK callback);
     void RegisterRemoteStreamRemoveCallBack(REMOTESTREAMREMOVE_CALLBACK callback);
@@ -37,6 +41,8 @@ public:
     bool DisconnectPeer(long long peer_id);
     void SendSDP(long long &id, std::string sdp, std::string type);
     void SendCandidate(long long &id, QString &sdpMid, int &sdpMLineIndex, QString &candidate);
+
+
 
 private:
     void onSocketConnected();
@@ -77,6 +83,11 @@ private:
     void onCreateVideoRoomFailed(unsigned int roomId);
     void onCreateTextRoomSuccessed(unsigned int roomId);
     void onCreateTextRoomFailed(unsigned int roomId);
+
+    void onDestroyVideoRoomSuccessed(unsigned int roomId);
+    void onDestroyVideoRoomFailed(unsigned int roomId);
+    void onDestroyTextRoomSuccessed(unsigned int roomId);
+    void onDestroyTextRoomFailed(unsigned int roomId);
 private:
     JanusWebSocket          *pWebSocket;
 

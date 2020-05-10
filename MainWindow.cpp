@@ -29,14 +29,12 @@ MainWindow::MainWindow(QWidget *parent) :
     this->connect(ui->CreateDR_PB, SIGNAL(clicked()), this, SLOT(onCreateDRButtonClicked()));
     this->connect(ui->DestoryDR_PB, SIGNAL(clicked()), this, SLOT(onDestoryDRButtonClicked()));
 
-    QVector<WINDOWID> remoteWindowID;
+
     remoteWindowID.push_back((WINDOWID)(ui->Remote_W1->winId()));
     remoteWindowID.push_back((WINDOWID)(ui->Remote_W2->winId()));
     remoteWindowID.push_back((WINDOWID)(ui->Remote_W3->winId()));
 
     this->localWindowID = (WINDOWID)(ui->Local_W->winId());
-
-    WebRTCInterface::GetInstance()->SetVideoWindows(this->localWindowID, remoteWindowID);
 }
 
 MainWindow::~MainWindow()
@@ -58,6 +56,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::onLoginButtonClicked()
 {
+
+    WebRTCInterface::GetInstance()->SetVideoWindows(this->localWindowID, remoteWindowID);
+
     QString serverUrl = ui->Url_LE->text();
     qDebug() << "onOnJoinButtonClicked ...." << serverUrl;
 
@@ -69,7 +70,7 @@ void MainWindow::onLoginButtonClicked()
 
 void MainWindow::onLogoutButtonClicked()
 {
-
+    WebRTCInterface::GetInstance()->Logout();
 }
 
 void MainWindow::onSendMessageButtonClicked()
@@ -89,7 +90,9 @@ void MainWindow::onJoinVRoomButtonClicked()
 
 void MainWindow::onLeaveVRoomButtonClicked()
 {
-    WebRTCInterface::GetInstance()->LeaveVideoRoom();
+    QString roomID = ui->VideoRoomID_LE->text();
+    int videoroomID = roomID.toUInt();
+    WebRTCInterface::GetInstance()->LeaveVideoRoom(videoroomID);
 }
 
 void MainWindow::onJoinDRoomButtonClicked()

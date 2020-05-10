@@ -20,16 +20,19 @@ public:
 
     void SetVideoWindows(WINDOWID local, QVector<WINDOWID> remote);
 
-    rtc::scoped_refptr<WebrtcStreamVideoAudio> GetLocalWebrtcStream_VideoAudio();
     rtc::scoped_refptr<WebrtcStreamDataChannels> GetLocalWebrtcStream_DataChannels();
 
     void SetTextRoomIDAndDisplayName(int inTextRoomID, std::string inDisplayName);
     int GetTextRoomID() { return mTextRoomID; }
     std::string GetTextRoomDisplayName() { return mTextRoomDisplayName; }
 
+    void LeaveVideoRoom();
+
+
 public Q_SLOTS:
     void ConnectToPeer_VideoAudio(long long peerId, bool show, bool connect, bool isLocal);
-    void ConnectToPeer_DataChannels(long long peerId, bool show, bool connect, bool isLocal);
+    //void ConnectToPeer_DataChannels(long long peerId, bool show, bool connect, bool isLocal);
+    void ConnectToPeer_DataChannels(long long peerId);
 
     void onLocalSDP(long long id, QString sdp, QString type);
 
@@ -74,13 +77,13 @@ private:
 
     static ConferenceManager* instance;
 public:
-    JanusVideoRoomManager                 mJanusVideoRoomManager;
+    JanusVideoRoomManager                 *pJanusVideoRoomManager;
 private:
     QHash<long long, RemoteStreamInfo_VideoAudio>    mRemoteStreamInfos_VideoAudio;
     QHash<long long, RemoteStreamInfo_DataChannels>    mRemoteStreamInfos_DataChannels;
     QVector<QPair<WINDOWID, long long>>   mRemoteWinds;
     WINDOWID                              mLocalWindow;
-    rtc::scoped_refptr<WebrtcStreamVideoAudio>    LocalStream_VideoAudio;
+
     rtc::scoped_refptr<WebrtcStreamDataChannels>    LocalStream_DataChannels;
 
 private:

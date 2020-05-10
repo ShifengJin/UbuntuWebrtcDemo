@@ -17,9 +17,12 @@ public:
     void SetVideoRoomDisplayName(std::string name);
     void SetTextRoomDisplayName(std::string name);
 
-    void AttachVideoRoom(int roomId);
-    void AttachTextRoom(int roomId);
-
+    void AttachVideoRoom(unsigned int roomId);
+    void AttachTextRoom(unsigned int roomId);
+#if 0
+    void LeaveVideoRoom();
+    void LeaveTextRoom();
+#endif
     void CreateVideoRoom(int roomId);
     void CreateTextRoom(int roomId);
     void DestoryVideoRoom(int roomId);
@@ -34,6 +37,9 @@ public:
     void SendSDP(std::string sdp, std::string type);
     void SendSDPText(std::string sdp, std::string type);
     void SendCandidate(QString sdpMid, int sdpMLineIndex, QString candidate);
+
+    unsigned int GetVideoRoomID() { return mVideoRoomId; }
+    unsigned int GetTextRoomID() { return mTextRoomId; }
 
 private:
     void onAttachVideoRoomJoin(const Json::Value &recvMsg);
@@ -68,8 +74,8 @@ private:
     long long int       mPrivateId = 0;
     long long int       mSubscribeId = 0;
 
-    int mVideoRoomId;
-    int mTextRoomId;
+    unsigned int mVideoRoomId;
+    unsigned int mTextRoomId;
     std::string mVideoRoomDisplayName = "cc";
     std::string mTextRoomDisplayName = "cc";
 
@@ -79,12 +85,20 @@ public:
     void RegisterCreateTextRoomSuccessed(CREATEROOM_CALLBACK callback);
     void RegisterCreateTextRoomFailed(CREATEROOM_CALLBACK callback);
 
+    void RegisterDestroyVideoRoomSuccessed(CREATEROOM_CALLBACK callback);
+    void RegisterDestroyVideoRoomFailed(CREATEROOM_CALLBACK callback);
+    void RegisterDestroyTextRoomSuccessed(CREATEROOM_CALLBACK callback);
+    void RegisterDestroyTextRoomFailed(CREATEROOM_CALLBACK callback);
 private:
-    CREATEROOM_CALLBACK          onCreateVideoRoomSuccessedCallback;
-    CREATEROOM_CALLBACK          onCreateVideoRoomFailedCallback;
+    CREATEROOM_CALLBACK          onCreateVideoRoomSuccessedCallback = NULL;
+    CREATEROOM_CALLBACK          onCreateVideoRoomFailedCallback = NULL;
+    CREATEROOM_CALLBACK          onCreateTextRoomSuccessedCallback = NULL;
+    CREATEROOM_CALLBACK          onCreateTextRoomFailedCallback = NULL;
 
-    CREATEROOM_CALLBACK          onCreateTextRoomSuccessedCallback;
-    CREATEROOM_CALLBACK          onCreateTextRoomFailedCallback;
+    CREATEROOM_CALLBACK          onDestroyVideoRoomSuccessedCallback = NULL;
+    CREATEROOM_CALLBACK          onDestroyVideoRoomFailedCallback = NULL;
+    CREATEROOM_CALLBACK          onDestroyTextRoomSuccessedCallback = NULL;
+    CREATEROOM_CALLBACK          onDestroyTextRoomFailedCallback = NULL;
 
 };
 

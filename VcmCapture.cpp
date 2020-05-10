@@ -21,7 +21,7 @@ VcmCapture::~VcmCapture()
 void VcmCapture::OnFrame(const webrtc::VideoFrame &frame)
 {
 
-    qDebug() << "============================> OnFrame";
+    // qDebug() << "============================> OnFrame";
     // 此处可以作为回调函数使用
     // ------------------------------------------------
     rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(frame.video_frame_buffer()->ToI420());
@@ -111,15 +111,15 @@ bool VcmCapture::Init(size_t width, size_t height, size_t target_fps, size_t cap
         return false;
     }
 #else
-    m_capture = new cv::VideoCapture(capture_device_index);
-    if(!m_capture->isOpened()){
-        RTC_LOG(INFO) << "open camera failed.";
-        return false;
-    }
-
-    m_capture->set(CV_CAP_PROP_FPS, target_fps);
-    m_capture->set(CV_CAP_PROP_FRAME_WIDTH, width);
-    m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    // m_capture = new cv::VideoCapture(capture_device_index);
+    // if(!m_capture->isOpened()){
+    //     RTC_LOG(INFO) << "open camera failed.";
+    //     return false;
+    // }
+    //
+    // m_capture->set(CV_CAP_PROP_FPS, target_fps);
+    // m_capture->set(CV_CAP_PROP_FRAME_WIDTH, width);
+    // m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
     videoWidth = width;
     videoHeight = height;
     pBufYuvI420 = new unsigned char[videoWidth * videoHeight * 3 / 2];
@@ -155,14 +155,14 @@ void *VcmCapture::RunCameraThread(void *param)
     size_t image_size = width * height;
     size_t I420_size = width * height * 3 / 2;
     while(1){
-        cv::Mat frame;
-        *Vcm->m_capture >> frame;
-        if(!frame.empty()){
-
-        }
-        cv::Mat frameYUV420P;
-        cv::cvtColor(frame, frameYUV420P, CV_BGR2YUV_I420);
-        memcpy(Vcm->pBufYuvI420, frameYUV420P.data, I420_size);
+        // cv::Mat frame;
+        // *Vcm->m_capture >> frame;
+        // if(!frame.empty()){
+        //
+        // }
+        // cv::Mat frameYUV420P;
+        // cv::cvtColor(frame, frameYUV420P, CV_BGR2YUV_I420);
+        // memcpy(Vcm->pBufYuvI420, frameYUV420P.data, I420_size);
         RTC_LOG(INFO) << "RunCameraThread";
         Vcm->SendFrame(width, height, Vcm->pBufYuvI420, width,
                        Vcm->pBufYuvI420 + image_size, width / 2,

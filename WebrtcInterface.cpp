@@ -17,33 +17,34 @@ void WebRTCInterface::Login(QString serverUrl)
 
 void WebRTCInterface::Logout()
 {
-
+    delete ConferenceManager::GetInstance();
 }
 
 void WebRTCInterface::JoinVideoRoom(int videoRoomID, std::string userName)
 {
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.JoinVideoRoom(videoRoomID, userName);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->JoinVideoRoom(videoRoomID, userName);
 }
 
-void WebRTCInterface::LeaveVideoRoom()
+void WebRTCInterface::LeaveVideoRoom(unsigned int videoRoomId)
 {
-
+    ConferenceManager::GetInstance()->LeaveVideoRoom();
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->LeaveVideoRoom(videoRoomId);
 }
 
 void WebRTCInterface::CreateVideoRoom(int roomId)
 {
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.CreateVideoRoom(roomId);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->CreateVideoRoom(roomId);
 }
 
 void WebRTCInterface::DestoryVideoRoom(int roomId)
 {
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.DestoryVideoRoom(roomId);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->DestoryVideoRoom(roomId);
 }
 
 void WebRTCInterface::JoinDataChannelRoom(int dataChannelRoomID, std::string userName)
 {
     ConferenceManager::GetInstance()->SetTextRoomIDAndDisplayName(dataChannelRoomID, userName);
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.JoinTextRoom(dataChannelRoomID);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->JoinTextRoom(dataChannelRoomID);
 }
 
 void WebRTCInterface::LeaveDataChannelRoom()
@@ -80,10 +81,10 @@ void WebRTCInterface::SendMessage(std::string message)
 
 void WebRTCInterface::CreateTextRoom(int roomId)
 {
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.CreateTextRoom(roomId);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->CreateTextRoom(roomId);
 }
 
 void WebRTCInterface::DestoryTextRoom(int roomId)
 {
-    ConferenceManager::GetInstance()->mJanusVideoRoomManager.DestoryTextRoom(roomId);
+    ConferenceManager::GetInstance()->pJanusVideoRoomManager->DestoryTextRoom(roomId);
 }

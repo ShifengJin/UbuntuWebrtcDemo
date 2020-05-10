@@ -35,7 +35,7 @@ private Q_SLOTS:
 
 private:
     WINDOWID localWindowID;
-
+    QVector<WINDOWID> remoteWindowID;
 protected:
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
